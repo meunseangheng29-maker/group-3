@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import Footer from './components/Footer.vue';
+import Navbar from './components/Navbar.vue';
+
+
 </script>
 
 <template>
-  <HelloWorld />
+      <Navbar/>
+      <main>
+        <RouterView/>
+      </main>
+      <Footer/>
 </template>
