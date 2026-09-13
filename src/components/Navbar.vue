@@ -2,27 +2,20 @@
 import {
   Search,
   User,
-  Heart,
   ShoppingCart,
   House,
   CupSoda,
   Tag,
-  Mail
+  Mail,
+  Info
 } from 'lucide-vue-next'
 
 import { useCart } from '../stores/cart'
 
 const { cartCount } = useCart()
 
-// បន្ថែម Function សម្រាប់ចាត់ចែងពេលចុច Search ឬ User
 function openSearch() {
   console.log('Search clicked')
-  // ដាក់កូដបើក Search Modal/Drawer ត្រង់នេះ
-}
-
-function openUserAccount() {
-  console.log('User clicked')
-  // ដាក់កូដបើក Profile ឬ Login Modal ត្រង់នេះ
 }
 </script>
 
@@ -35,7 +28,9 @@ function openUserAccount() {
         <CupSoda :size="26" />
       </div>
 
-      <span>Team<span><3Coffee</span></span>
+      <span>
+        Team<span>&lt;3Coffee</span>
+      </span>
     </RouterLink>
 
 
@@ -45,6 +40,11 @@ function openUserAccount() {
       <RouterLink to="/">
         <House :size="20" />
         Home
+      </RouterLink>
+
+      <RouterLink to="/about">
+        <Info :size="20" />
+        About
       </RouterLink>
 
       <RouterLink to="/drinks">
@@ -65,26 +65,36 @@ function openUserAccount() {
     </div>
 
 
-    <!-- Right icons (បានកែប្រែឱ្យចុចបាន) -->
+    <!-- Right Actions -->
     <div class="nav-actions">
 
-      <!-- 1. Search Icon (ចុចដើម្បីបើក Search Function) -->
-      <button class="icon-btn" @click="openSearch" title="Search">
+      <!-- Search -->
+      <RouterLink
+        to="/search"
+        class="icon-btn"
+        title="Search"
+      >
         <Search :size="22" />
-      </button>
-
-      <!-- 2. Profile / User Icon (បើកទៅកាន់ Page Profile ឬ Login) -->
-      <RouterLink to="/profile" class="icon-btn" title="Account">
-        <User :size="22" />
       </RouterLink>
 
-      <!-- 3. Favorite / Heart Icon (បើកទៅកាន់ Page Favorites) -->
-      <RouterLink to="/favorites" class="icon-btn" title="Favorites">
-        <Heart :size="22" />
+
+      <!-- Login -->
+      <RouterLink
+        to="/login"
+        class="login-btn"
+        title="Login"
+      >
+        <User :size="20" />
+        <span>Login</span>
       </RouterLink>
 
-      <!-- 4. Cart Icon (បើកទៅកាន់ Page Cart) -->
-      <RouterLink to="/cart" class="cart-btn" title="Shopping Cart">
+
+      <!-- Cart -->
+      <RouterLink
+        to="/cart"
+        class="cart-btn"
+        title="Shopping Cart"
+      >
         <ShoppingCart :size="22" />
 
         <span
@@ -100,155 +110,324 @@ function openUserAccount() {
   </nav>
 </template>
 
+
 <style scoped>
-/* ================= NAVBAR CONTAINER ================= */
+
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 16px 40px;
+
   background: rgba(255, 255, 255, 0.85);
+
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+
   position: sticky;
   top: 0;
+
   z-index: 1000;
+
   border-bottom: 1px solid #f8bbd0;
-  box-shadow: 0 4px 20px rgba(233, 30, 99, 0.03);
+
+  box-shadow:
+    0 4px 20px rgba(233, 30, 99, 0.03);
 }
 
+
 /* ================= LOGO ================= */
+
 .logo {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
   text-decoration: none;
+
   font-size: 22px;
   font-weight: 900;
+
   color: #111111;
-  letter-spacing: -0.5px;
 }
 
 .logo-icon {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, #e91e63 0%, #d81b60 100%);
+
+  background: linear-gradient(
+    135deg,
+    #e91e63,
+    #d81b60
+  );
+
   border-radius: 12px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   color: white;
-  box-shadow: 0 6px 15px rgba(233, 30, 99, 0.25);
+
+  box-shadow:
+    0 6px 15px rgba(233, 30, 99, 0.25);
 }
 
 .logo span span {
   color: #d81b60;
 }
 
+
 /* ================= NAV LINKS ================= */
+
 .nav-links {
   display: flex;
   align-items: center;
+
   gap: 8px;
+
   background: #fcf8f9;
+
   padding: 6px 10px;
+
   border-radius: 30px;
+
   border: 1px solid #f8bbd0;
 }
 
 .nav-links a {
   display: flex;
   align-items: center;
+
   gap: 8px;
+
   padding: 8px 18px;
+
   border-radius: 20px;
+
   text-decoration: none;
+
   color: #666666;
+
   font-size: 14px;
   font-weight: 700;
+
   transition: all 0.25s ease;
 }
 
 .nav-links a:hover {
   color: #d81b60;
-  background: rgba(253, 242, 248, 0.8);
+
+  background: #fdf2f8;
 }
 
-/* Vue Router Active State Styling */
 .nav-links a.router-link-active {
   background: #d81b60;
+
   color: white;
-  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.25);
+
+  box-shadow:
+    0 4px 12px rgba(216, 27, 96, 0.25);
 }
 
+
 /* ================= RIGHT ACTIONS ================= */
+
 .nav-actions {
   display: flex;
   align-items: center;
+
   gap: 10px;
 }
 
-.icon-btn,
-.cart-btn {
+
+/* Search */
+
+.icon-btn {
   width: 42px;
   height: 42px;
+
   border-radius: 12px;
+
   border: 1px solid #f8bbd0;
+
   background: white;
+
   color: #444444;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
+
   cursor: pointer;
-  position: relative;
+
   transition: all 0.2s ease;
 }
 
-.icon-btn:hover,
-.cart-btn:hover {
+.icon-btn:hover {
   background: #fce4ec;
+
   color: #d81b60;
+
   border-color: #f48fb1;
+
   transform: translateY(-2px);
 }
 
-/* Router Active Style សម្រាប់ Icon (ឧទាហរណ៍៖ កំពុងនៅលើទំព័រ Profile ឬ Favorites) */
-.icon-btn.router-link-active,
-.cart-btn.router-link-active {
-  background: #fdf2f8;
-  color: #d81b60;
-  border-color: #d81b60;
-}
 
-.cart-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #d81b60;
-  color: white;
-  font-size: 11px;
-  font-weight: 800;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+/* Login */
+
+.login-btn {
+  height: 42px;
+
+  padding: 0 16px;
+
+  border-radius: 12px;
+
+  border: 1px solid #f8bbd0;
+
+  background: white;
+
+  color: #444444;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+
+  gap: 7px;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  transition: all 0.2s ease;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+.login-btn:hover {
+  background: #d81b60;
+
+  color: white;
+
+  border-color: #d81b60;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 5px 15px rgba(216, 27, 96, 0.2);
+}
+
+
+/* Cart */
+
+.cart-btn {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 12px;
+
+  border: 1px solid #f8bbd0;
+
+  background: white;
+
+  color: #444444;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  position: relative;
+
+  transition: all 0.2s ease;
+}
+
+.cart-btn:hover {
+  background: #fce4ec;
+
+  color: #d81b60;
+
+  border-color: #f48fb1;
+
+  transform: translateY(-2px);
+}
+
+
+/* Cart Badge */
+
+.cart-badge {
+  position: absolute;
+
+  top: -5px;
+  right: -5px;
+
+  background: #d81b60;
+
+  color: white;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid white;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
   .navbar {
     padding: 14px 20px;
   }
-  .nav-links span {
-    display: none;
-  }
+
   .nav-links a {
     padding: 8px 10px;
   }
+
+  .login-btn span {
+    display: none;
+  }
+
+  .login-btn {
+    width: 42px;
+    padding: 0;
+  }
+
 }
+
+
+@media (max-width: 700px) {
+
+  .logo > span {
+    display: none;
+  }
+
+  .nav-links {
+    gap: 2px;
+  }
+
+  .nav-links a {
+    padding: 8px;
+  }
+
+  .nav-links a svg {
+    display: none;
+  }
+
+}
+
 </style>

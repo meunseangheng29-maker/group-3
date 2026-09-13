@@ -1,45 +1,63 @@
+
 <template>
   <footer class="footer">
     <div class="footer-container">
+
       <div class="footer-content">
+
         <!-- Brand Section -->
         <div class="footer-brand">
+
           <div class="footer-logo">
             <CupSoda :size="28" color="#d81b60" />
-            <span>Team<span class="highlight">&lt;3</span></span>
+
+            <span>
+              Team<span class="highlight">&lt;3</span>
+            </span>
           </div>
 
           <p class="brand-desc">
             Fresh drinks, happy moments.<br>
-            Made with love for My Team3 togeter.
+            Made with love for My Team3 together.
           </p>
+
         </div>
 
         <!-- Links Section -->
         <div class="footer-group">
+
           <h3>Quick Links</h3>
+
           <nav class="footer-links">
             <RouterLink to="/">Home</RouterLink>
+            <RouterLink to="/about">About</RouterLink>
             <RouterLink to="/drinks">Drinks</RouterLink>
             <RouterLink to="/offers">Offers</RouterLink>
             <RouterLink to="/contact">Contact</RouterLink>
           </nav>
+
         </div>
 
         <!-- Contact Section -->
         <div class="footer-group">
+
           <h3>Contact</h3>
+
           <div class="contact-info">
             <p>Phnom Penh, Cambodia</p>
             <p>+855 12 345 678</p>
             <p>team3@gmail.com</p>
           </div>
+
         </div>
+
       </div>
 
+      <!-- Bottom -->
       <div class="footer-bottom">
         <p>© 2026 Team3. All rights reserved.</p>
       </div>
+
     </div>
   </footer>
 </template>
@@ -50,8 +68,14 @@ import { CupSoda } from 'lucide-vue-next'
 
 <style scoped>
 /* ================= FOOTER CONTAINER ================= */
+
 .footer {
-  background: linear-gradient(180deg, #ffffff 0%, #fce4ec 100%);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fce4ec 100%
+  );
+
   border-top: 1px solid #f8bbd0;
   padding: 60px 20px 25px;
   color: #444;
@@ -71,14 +95,18 @@ import { CupSoda } from 'lucide-vue-next'
   border-bottom: 1px solid #f48fb1;
 }
 
+
 /* ================= BRAND ================= */
+
 .footer-logo {
   display: flex;
   align-items: center;
   gap: 10px;
+
   font-size: 22px;
   font-weight: 900;
   color: #250505;
+
   margin-bottom: 14px;
 }
 
@@ -99,7 +127,9 @@ import { CupSoda } from 'lucide-vue-next'
   margin: 0;
 }
 
+
 /* ================= HEADINGS ================= */
+
 .footer-group h3 {
   font-size: 16px;
   font-weight: 800;
@@ -107,7 +137,9 @@ import { CupSoda } from 'lucide-vue-next'
   margin: 0 0 18px;
 }
 
+
 /* ================= LINKS ================= */
+
 .footer-links {
   display: flex;
   flex-direction: column;
@@ -119,6 +151,7 @@ import { CupSoda } from 'lucide-vue-next'
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
+
   transition: all 0.2s ease;
   width: fit-content;
 }
@@ -128,30 +161,44 @@ import { CupSoda } from 'lucide-vue-next'
   transform: translateX(5px);
 }
 
-/* Router active link inside footer */
+
+/* Active Router Link */
+
 .footer-links a.router-link-active {
   color: #d81b60;
   font-weight: 800;
 }
 
+
 /* ================= CONTACT ================= */
+
 .contact-info p {
   color: #666;
   font-size: 14px;
+
   margin: 0 0 10px;
+
   line-height: 1.5;
 }
 
+
 /* ================= BOTTOM ================= */
+
 .footer-bottom {
   padding-top: 25px;
+
   text-align: center;
+
   color: #888888;
+
   font-size: 13px;
+
   font-weight: 500;
 }
 
+
 /* ================= RESPONSIVE ================= */
+
 @media (max-width: 768px) {
   .footer-content {
     grid-template-columns: 1fr;
@@ -159,3 +206,4 @@ import { CupSoda } from 'lucide-vue-next'
   }
 }
 </style>
+

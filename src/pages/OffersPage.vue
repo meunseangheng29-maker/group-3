@@ -1,69 +1,108 @@
-
-
 <script setup lang="ts">
 import {
   Heart,
   ShoppingBag,
-  ArrowRight,
-  Sparkles
+  ArrowRight
 } from 'lucide-vue-next'
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+
 import { drinks } from '../data/Drink'
 import { useCart } from '../stores/cart'
 
+
+// =====================================================
+// CART
+// =====================================================
+
 const { addToCart } = useCart()
+
+
+// =====================================================
+// OFFERS
+// =====================================================
 
 const offers = computed(() => {
   return drinks.filter(drink => drink.originalPrice)
 })
 
-function discountPercent(price: number, originalPrice: number) {
+
+// =====================================================
+// DISCOUNT
+// =====================================================
+
+function discountPercent(
+  price: number,
+  originalPrice: number
+) {
   return Math.round(
     ((originalPrice - price) / originalPrice) * 100
   )
 }
+
+
+// =====================================================
+// FAVORITES
+// =====================================================
+
+const favorites = ref<number[]>([])
+
+function isFavorite(drinkId: number) {
+  return favorites.value.includes(drinkId)
+}
+
+function toggleFavorite(drinkId: number) {
+  if (isFavorite(drinkId)) {
+    favorites.value = favorites.value.filter(
+      id => id !== drinkId
+    )
+  } else {
+    favorites.value.push(drinkId)
+  }
+}
 </script>
+
 
 <template>
 
   <main class="offers-page">
 
-    <!-- HEADER -->
 
-    <section class="offers-header">
+    <!-- =================================================
+         HERO
+    ================================================= -->
 
-      <div>
+    <section class="offers-hero">
 
-        <span class="small-title">
-          <Sparkles :size="15" />
-          LIMITED TIME
-        </span>
-
-        <h1>
-          Special <span>Offers</span>
-        </h1>
-
-        <p>
-          Treat yourself to something delicious.
-          Enjoy our best drinks at special prices.
-        </p>
-
+      <div class="hero-label">
+        ✨ LIMITED TIME OFFERS
       </div>
 
-      <div class="offer-count">
-        {{ offers.length }} Offers
-      </div>
+      <h1>
+        Special
+        <span>Offers</span>
+      </h1>
+
+      <p>
+        Treat yourself to something delicious.
+        Enjoy our best drinks at special prices.
+      </p>
 
     </section>
 
 
-    <!-- FEATURE OFFER -->
+
+    <!-- =================================================
+         FEATURED OFFER
+    ================================================= -->
 
     <section
-      v-if="offers.length"
+      v-if="offers.length > 0"
       class="featured-offer"
     >
+
+
+      <!-- IMAGE -->
 
       <div class="featured-image">
 
@@ -72,19 +111,31 @@ function discountPercent(price: number, originalPrice: number) {
           :alt="offers[0].name"
         />
 
+
+        <!-- DISCOUNT -->
+
         <div class="discount-circle">
+
           <strong>
-            {{ discountPercent(
-              offers[0].price,
-              offers[0].originalPrice!
-            ) }}%
+            {{
+              discountPercent(
+                offers[0].price,
+                offers[0].originalPrice!
+              )
+            }}%
           </strong>
 
-          <span>OFF</span>
+          <span>
+            OFF
+          </span>
+
         </div>
 
       </div>
 
+
+
+      <!-- CONTENT -->
 
       <div class="featured-content">
 
@@ -92,14 +143,18 @@ function discountPercent(price: number, originalPrice: number) {
           TODAY'S SPECIAL
         </span>
 
+
         <h2>
           {{ offers[0].name }}
         </h2>
+
 
         <p>
           {{ offers[0].description }}
         </p>
 
+
+        <!-- PRICE -->
 
         <div class="featured-price">
 
@@ -114,18 +169,42 @@ function discountPercent(price: number, originalPrice: number) {
         </div>
 
 
+        <!-- ACTIONS -->
+
         <div class="featured-actions">
 
-          <button
-            class="buy-btn"
-            @click="addToCart(offers[0])"
-          >
-            Order Now
-            <ShoppingBag :size="18" />
-          </button>
 
-          <button class="heart-btn">
-            <Heart :size="21" />
+          <!-- ORDER NOW -->
+
+          <RouterLink
+            to="/drinks"
+            class="buy-btn"
+          >
+
+            Order Now
+
+            <ShoppingBag :size="18" />
+
+          </RouterLink>
+
+
+          <!-- FAVORITE -->
+
+          <button
+            class="heart-btn"
+            @click="toggleFavorite(offers[0].id)"
+            title="Add to favorites"
+          >
+
+            <Heart
+              :size="21"
+              :fill="
+                isFavorite(offers[0].id)
+                  ? 'currentColor'
+                  : 'none'
+              "
+            />
+
           </button>
 
         </div>
@@ -135,32 +214,61 @@ function discountPercent(price: number, originalPrice: number) {
     </section>
 
 
-    <!-- ALL OFFERS -->
+
+    <!-- =================================================
+         ALL OFFERS
+    ================================================= -->
 
     <section class="all-offers">
+
+
+      <!-- SECTION TITLE -->
 
       <div class="section-title">
 
         <div>
-          <span>MORE DEALS</span>
-          <h2>Grab Your Favorite</h2>
+
+          <span>
+            MORE DEALS
+          </span>
+
+          <h2>
+            Grab Your Favorite
+          </h2>
+
         </div>
 
+
         <RouterLink to="/drinks">
+
           View all drinks
+
           <ArrowRight :size="17" />
+
         </RouterLink>
 
       </div>
 
 
-      <div class="offers-grid">
+
+      <!-- =================================================
+           OFFERS GRID
+      ================================================= -->
+
+      <div
+        v-if="offers.length > 0"
+        class="offers-grid"
+      >
+
 
         <article
           v-for="drink in offers"
           :key="drink.id"
           class="offer-card"
         >
+
+
+          <!-- IMAGE -->
 
           <div class="offer-image">
 
@@ -169,36 +277,76 @@ function discountPercent(price: number, originalPrice: number) {
               :alt="drink.name"
             />
 
+
+            <!-- SALE -->
+
             <span class="sale-badge">
+
               {{
                 discountPercent(
                   drink.price,
                   drink.originalPrice!
                 )
               }}% OFF
+
             </span>
 
-            <button class="card-heart">
-              <Heart :size="18" />
+
+            <!-- HEART -->
+
+            <button
+              class="card-heart"
+              @click="toggleFavorite(drink.id)"
+              title="Add to favorites"
+            >
+
+              <Heart
+                :size="18"
+                :fill="
+                  isFavorite(drink.id)
+                    ? 'currentColor'
+                    : 'none'
+                "
+              />
+
             </button>
 
           </div>
 
 
+
+          <!-- INFORMATION -->
+
           <div class="offer-info">
+
+
+            <!-- CATEGORY -->
 
             <span class="category">
               {{ drink.category }}
             </span>
 
-            <h3>{{ drink.name }}</h3>
+
+            <!-- NAME -->
+
+            <h3>
+              {{ drink.name }}
+            </h3>
+
+
+            <!-- DESCRIPTION -->
 
             <p>
               {{ drink.description }}
             </p>
 
 
+            <!-- FOOTER -->
+
             <div class="offer-footer">
+
+
+              <!-- PRICE -->
 
               <div class="prices">
 
@@ -213,11 +361,16 @@ function discountPercent(price: number, originalPrice: number) {
               </div>
 
 
+              <!-- ADD TO CART -->
+
               <button
                 class="plus-btn"
                 @click="addToCart(drink)"
+                title="Add to cart"
               >
+
                 <ShoppingBag :size="18" />
+
               </button>
 
             </div>
@@ -225,6 +378,32 @@ function discountPercent(price: number, originalPrice: number) {
           </div>
 
         </article>
+
+      </div>
+
+
+
+      <!-- =================================================
+           NO OFFERS
+      ================================================= -->
+
+      <div
+        v-else
+        class="no-offers"
+      >
+
+        <h2>
+          No offers available
+        </h2>
+
+        <p>
+          Please check again later for special offers.
+        </p>
+
+
+        <RouterLink to="/drinks">
+          Browse Drinks
+        </RouterLink>
 
       </div>
 
@@ -237,111 +416,212 @@ function discountPercent(price: number, originalPrice: number) {
 
 <style scoped>
 
-/* ================= PAGE ================= */
+/* =====================================================
+   PAGE
+===================================================== */
 
 .offers-page {
-  max-width: 1200px;
-
-  margin: 0 auto;
-
-  padding: 40px 20px 80px;
-
-  background: #fff;
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
 }
 
 
-/* ================= HEADER ================= */
+/* =====================================================
+   HERO
+===================================================== */
 
-.offers-header {
+.offers-hero {
+  min-height: 520px;
+
   display: flex;
-
-  justify-content: space-between;
-
-  align-items: flex-end;
-
-  margin-bottom: 30px;
-}
-
-
-.small-title {
-  display: flex;
+  flex-direction: column;
 
   align-items: center;
+  justify-content: center;
 
-  gap: 5px;
+  text-align: center;
 
-  color: #df0874;
+  padding: 70px 20px;
 
-  font-size: 11px;
+  background:
+    linear-gradient(
+      135deg,
+      #fce4ec 0%,
+      #f3c1d5 50%,
+      #f8dce9 100%
+    );
 
-  font-weight: 800;
+  position: relative;
 
-  letter-spacing: 1.5px;
+  overflow: hidden;
 }
 
 
-.offers-header h1 {
-  margin: 7px 0;
+/* Decorative circle */
 
-  font-size: 48px;
+.offers-hero::before {
+  content: "";
 
-  letter-spacing: -1.5px;
+  position: absolute;
+
+  width: 350px;
+  height: 350px;
+
+  border-radius: 50%;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.15
+  );
+
+  top: -180px;
+  left: -100px;
 }
 
 
-.offers-header h1 span {
-  color: #df0874;
+.offers-hero::after {
+  content: "";
+
+  position: absolute;
+
+  width: 300px;
+  height: 300px;
+
+  border-radius: 50%;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.12
+  );
+
+  bottom: -150px;
+  right: -80px;
 }
 
 
-.offers-header p {
-  margin: 0;
+/* =====================================================
+   HERO LABEL
+===================================================== */
 
-  color: #777;
+.hero-label {
+  position: relative;
 
-  max-width: 500px;
+  z-index: 2;
 
-  font-size: 15px;
-}
+  background: #ffffff;
 
+  color: #c92f61;
 
-.offer-count {
-  background: #fff4ea;
-
-  color: #df0874;
-
-  padding: 10px 17px;
+  padding: 11px 40px;
 
   border-radius: 30px;
 
-  font-size: 13px;
+  font-size: 14px;
 
-  font-weight: 700;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 28px;
+
+  box-shadow:
+    0 8px 25px rgba(
+      0,
+      0,
+      0,
+      0.05
+    );
 }
 
 
-/* ================= FEATURE ================= */
+/* =====================================================
+   HERO TITLE
+===================================================== */
+
+.offers-hero h1 {
+  position: relative;
+
+  z-index: 2;
+
+  margin: 0;
+
+  font-size: 64px;
+
+  line-height: 1.05;
+
+  font-weight: 900;
+
+  color: #18090e;
+
+  letter-spacing: -2px;
+}
+
+
+.offers-hero h1 span {
+  display: block;
+
+  color: #ce3764;
+}
+
+
+/* =====================================================
+   HERO DESCRIPTION
+===================================================== */
+
+.offers-hero p {
+  position: relative;
+
+  z-index: 2;
+
+  max-width: 700px;
+
+  margin: 28px auto 0;
+
+  font-size: 18px;
+
+  line-height: 1.7;
+
+  color: #666666;
+}
+
+
+/* =====================================================
+   FEATURE OFFER
+===================================================== */
 
 .featured-offer {
+  max-width: 1200px;
+
+  margin: 60px auto 70px;
+
   display: grid;
 
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns:
+    1.1fr 1fr;
 
-  background: linear-gradient(
-    135deg,
-    #fff2e5,
-    #fffaf6
-  );
+  background:
+    linear-gradient(
+      135deg,
+      #fff2e5,
+      #fffaf6
+    );
 
   border-radius: 25px;
 
   overflow: hidden;
 
   min-height: 380px;
-
-  margin-bottom: 55px;
 }
 
+
+/* =====================================================
+   FEATURE IMAGE
+===================================================== */
 
 .featured-image {
   position: relative;
@@ -359,6 +639,10 @@ function discountPercent(price: number, originalPrice: number) {
   display: block;
 }
 
+
+/* =====================================================
+   DISCOUNT CIRCLE
+===================================================== */
 
 .discount-circle {
   position: absolute;
@@ -378,12 +662,20 @@ function discountPercent(price: number, originalPrice: number) {
   border: 4px solid white;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
-  box-shadow: 0 8px 20px rgba(0,0,0,.15);
+  box-shadow:
+    0 8px 20px rgba(
+      0,
+      0,
+      0,
+      0.15
+    );
 }
 
 
@@ -394,9 +686,14 @@ function discountPercent(price: number, originalPrice: number) {
 
 .discount-circle span {
   font-size: 10px;
+
   font-weight: 700;
 }
 
+
+/* =====================================================
+   FEATURE CONTENT
+===================================================== */
 
 .featured-content {
   padding: 50px;
@@ -436,7 +733,7 @@ function discountPercent(price: number, originalPrice: number) {
 
 
 .featured-content p {
-  color: #666;
+  color: #666666;
 
   line-height: 1.6;
 
@@ -445,6 +742,10 @@ function discountPercent(price: number, originalPrice: number) {
   font-size: 14px;
 }
 
+
+/* =====================================================
+   FEATURE PRICE
+===================================================== */
 
 .featured-price {
   display: flex;
@@ -465,11 +766,15 @@ function discountPercent(price: number, originalPrice: number) {
 
 
 .featured-price del {
-  color: #888;
+  color: #888888;
 
   font-size: 18px;
 }
 
+
+/* =====================================================
+   FEATURE BUTTONS
+===================================================== */
 
 .featured-actions {
   display: flex;
@@ -477,6 +782,10 @@ function discountPercent(price: number, originalPrice: number) {
   gap: 10px;
 }
 
+
+/* =====================================================
+   ORDER NOW
+===================================================== */
 
 .buy-btn {
   border: none;
@@ -490,18 +799,37 @@ function discountPercent(price: number, originalPrice: number) {
   padding: 14px 23px;
 
   display: flex;
+
   align-items: center;
+
+  justify-content: center;
 
   gap: 9px;
 
   font-weight: 700;
 
   cursor: pointer;
+
+  text-decoration: none;
+
+  transition: 0.2s;
 }
 
 
+.buy-btn:hover {
+  background: #c51665;
+
+  transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   FEATURE HEART
+===================================================== */
+
 .heart-btn {
   width: 49px;
+  height: 49px;
 
   border: none;
 
@@ -512,14 +840,40 @@ function discountPercent(price: number, originalPrice: number) {
   border-radius: 11px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   cursor: pointer;
+
+  transition: 0.2s;
 }
 
 
-/* ================= ALL OFFERS ================= */
+.heart-btn:hover {
+  background: #fff0f6;
+
+  transform: scale(1.05);
+}
+
+
+/* =====================================================
+   ALL OFFERS
+===================================================== */
+
+.all-offers {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 0 20px 80px;
+}
+
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
 
 .section-title {
   display: flex;
@@ -547,6 +901,8 @@ function discountPercent(price: number, originalPrice: number) {
   margin: 5px 0 0;
 
   font-size: 29px;
+
+  color: #111111;
 }
 
 
@@ -564,17 +920,33 @@ function discountPercent(price: number, originalPrice: number) {
   font-size: 14px;
 
   font-weight: 700;
+
+  transition: 0.2s;
 }
 
+
+.section-title a:hover {
+  gap: 9px;
+}
+
+
+/* =====================================================
+   OFFERS GRID
+===================================================== */
 
 .offers-grid {
   display: grid;
 
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns:
+    repeat(3, 1fr);
 
   gap: 22px;
 }
 
+
+/* =====================================================
+   OFFER CARD
+===================================================== */
 
 .offer-card {
   border: 1px solid #eeeeee;
@@ -585,16 +957,26 @@ function discountPercent(price: number, originalPrice: number) {
 
   background: white;
 
-  transition: .25s;
+  transition: 0.25s;
 }
 
 
 .offer-card:hover {
   transform: translateY(-5px);
 
-  box-shadow: 0 15px 35px rgba(0,0,0,.09);
+  box-shadow:
+    0 15px 35px rgba(
+      0,
+      0,
+      0,
+      0.09
+    );
 }
 
+
+/* =====================================================
+   OFFER IMAGE
+===================================================== */
 
 .offer-image {
   height: 260px;
@@ -613,14 +995,19 @@ function discountPercent(price: number, originalPrice: number) {
 
   object-fit: cover;
 
-  transition: .3s;
+  transition: 0.3s;
 }
 
 
-.offer-card:hover .offer-image img {
+.offer-card:hover
+.offer-image img {
   transform: scale(1.05);
 }
 
+
+/* =====================================================
+   SALE BADGE
+===================================================== */
 
 .sale-badge {
   position: absolute;
@@ -642,6 +1029,10 @@ function discountPercent(price: number, originalPrice: number) {
 }
 
 
+/* =====================================================
+   CARD HEART
+===================================================== */
+
 .card-heart {
   position: absolute;
 
@@ -662,13 +1053,33 @@ function discountPercent(price: number, originalPrice: number) {
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
   cursor: pointer;
 
-  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  box-shadow:
+    0 4px 12px rgba(
+      0,
+      0,
+      0,
+      0.1
+    );
+
+  transition: 0.2s;
 }
 
+
+.card-heart:hover {
+  transform: scale(1.1);
+
+  background: #fff0f6;
+}
+
+
+/* =====================================================
+   OFFER INFORMATION
+===================================================== */
 
 .offer-info {
   padding: 18px;
@@ -676,7 +1087,7 @@ function discountPercent(price: number, originalPrice: number) {
 
 
 .category {
-  color: #999;
+  color: #999999;
 
   font-size: 9px;
 
@@ -692,11 +1103,13 @@ function discountPercent(price: number, originalPrice: number) {
   font-size: 18px;
 
   margin: 6px 0;
+
+  color: #111111;
 }
 
 
 .offer-info p {
-  color: #777;
+  color: #777777;
 
   font-size: 12px;
 
@@ -709,6 +1122,10 @@ function discountPercent(price: number, originalPrice: number) {
   margin-bottom: 15px;
 }
 
+
+/* =====================================================
+   OFFER FOOTER
+===================================================== */
 
 .offer-footer {
   display: flex;
@@ -736,11 +1153,15 @@ function discountPercent(price: number, originalPrice: number) {
 
 
 .prices del {
-  color: #999;
+  color: #999999;
 
   font-size: 13px;
 }
 
+
+/* =====================================================
+   ADD TO CART
+===================================================== */
 
 .plus-btn {
   width: 38px;
@@ -750,17 +1171,19 @@ function discountPercent(price: number, originalPrice: number) {
 
   background: white;
 
-  color:#df0874;
+  color: #df0874;
 
   border-radius: 9px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   cursor: pointer;
 
-  transition: .2s;
+  transition: 0.2s;
 }
 
 
@@ -768,31 +1191,177 @@ function discountPercent(price: number, originalPrice: number) {
   background: #df0874;
 
   color: white;
+
+  transform: scale(1.05);
 }
 
 
-/* ================= RESPONSIVE ================= */
+/* =====================================================
+   NO OFFERS
+===================================================== */
+
+.no-offers {
+  text-align: center;
+
+  padding: 70px 20px;
+
+  color: #666666;
+}
+
+
+.no-offers h2 {
+  color: #222222;
+
+  margin-bottom: 10px;
+}
+
+
+.no-offers p {
+  margin-bottom: 20px;
+}
+
+
+.no-offers a {
+  display: inline-block;
+
+  background: #df0874;
+
+  color: white;
+
+  padding: 12px 22px;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
 
 @media (max-width: 850px) {
 
+  .offers-hero {
+    min-height: 450px;
+  }
+
+
+  .offers-hero h1 {
+    font-size: 52px;
+  }
+
+
   .featured-offer {
     grid-template-columns: 1fr;
+
+    margin-left: 20px;
+
+    margin-right: 20px;
   }
+
 
   .featured-image {
     height: 330px;
+
+    min-height: 330px;
   }
 
+
+  .featured-content {
+    padding: 40px;
+  }
+
+
   .offers-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
   }
 
 }
 
 
+/* =====================================================
+   MOBILE
+===================================================== */
+
 @media (max-width: 600px) {
 
-  .offers-header {
+  .offers-hero {
+    min-height: 420px;
+
+    padding: 50px 20px;
+  }
+
+
+  .hero-label {
+    padding: 10px 25px;
+
+    font-size: 11px;
+
+    letter-spacing: 1.5px;
+  }
+
+
+  .offers-hero h1 {
+    font-size: 42px;
+
+    letter-spacing: -1px;
+  }
+
+
+  .offers-hero p {
+    font-size: 15px;
+
+    max-width: 400px;
+  }
+
+
+  .featured-offer {
+    margin-top: 35px;
+
+    margin-bottom: 50px;
+
+    margin-left: 15px;
+
+    margin-right: 15px;
+
+    border-radius: 18px;
+  }
+
+
+  .featured-image {
+    height: 280px;
+
+    min-height: 280px;
+  }
+
+
+  .featured-content {
+    padding: 30px 25px;
+  }
+
+
+  .featured-content h2 {
+    font-size: 30px;
+  }
+
+
+  .featured-price strong {
+    font-size: 27px;
+  }
+
+
+  .all-offers {
+    padding-left: 15px;
+
+    padding-right: 15px;
+  }
+
+
+  .section-title {
     align-items: flex-start;
 
     flex-direction: column;
@@ -800,16 +1369,21 @@ function discountPercent(price: number, originalPrice: number) {
     gap: 15px;
   }
 
-  .offers-header h1 {
-    font-size: 38px;
+
+  .section-title h2 {
+    font-size: 25px;
   }
 
-  .featured-content {
-    padding: 30px;
-  }
 
   .offers-grid {
     grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+
+  .offer-image {
+    height: 280px;
   }
 
 }

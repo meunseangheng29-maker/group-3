@@ -1,187 +1,211 @@
 <template>
-
   <main class="contact-page">
 
-    <section class="contact-header">
+    <!-- ================= HERO ================= -->
+    <section class="contact-hero">
 
-      <p class="section-small">
+      <div class="hero-label">
         WE'D LOVE TO HEAR FROM YOU
-      </p>
+      </div>
 
       <h1>
-        Contact Us
+        Get in Touch With
+        <span>Us</span>
       </h1>
 
       <p>
-        Have a question or suggestion?
-        Send us a message.
+        Have a question, suggestion, or just want to say hello?
+        <br />
+        We would love to hear from you.
       </p>
 
     </section>
 
 
-    <section class="contact-container">
+    <!-- ================= CONTACT SECTION ================= -->
+    <section class="contact-section">
 
-      <div class="contact-info">
+      <div class="contact-container">
 
-        <div class="info-item">
+        <!-- ================= CONTACT INFO ================= -->
+        <div class="contact-info">
 
-          <div class="info-icon">
-            <MapPin />
+          <div class="info-title">
+            <span>CONTACT INFORMATION</span>
+            <h2>Let's Talk</h2>
+            <p>
+              We're always happy to hear from our customers.
+              Feel free to contact us anytime.
+            </p>
           </div>
 
-          <div>
-            <h3>
-              Visit Us
-            </h3>
 
-            <p>
-              Phnom Penh, Cambodia
-            </p>
+          <!-- Visit Us -->
+          <div class="info-item">
+
+            <div class="info-icon">
+              <MapPin :size="22" />
+            </div>
+
+            <div>
+              <h3>Visit Us</h3>
+              <p>Phnom Penh, Cambodia</p>
+            </div>
+
+          </div>
+
+
+          <!-- Call Us -->
+          <div class="info-item">
+
+            <div class="info-icon">
+              <Phone :size="22" />
+            </div>
+
+            <div>
+              <h3>Call Us</h3>
+              <p>+855 712 447 679</p>
+            </div>
+
+          </div>
+
+
+          <!-- Email -->
+          <div class="info-item">
+
+            <div class="info-icon">
+              <Mail :size="22" />
+            </div>
+
+            <div>
+              <h3>Email Us</h3>
+              <p>Team3@email.com</p>
+            </div>
+
+          </div>
+
+
+          <!-- Opening Hours -->
+          <div class="info-item">
+
+            <div class="info-icon">
+              <Clock :size="22" />
+            </div>
+
+            <div>
+              <h3>Opening Hours</h3>
+              <p>8:00 AM – 9:00 PM</p>
+            </div>
+
           </div>
 
         </div>
 
 
-        <div class="info-item">
+        <!-- ================= CONTACT FORM ================= -->
+        <form
+          class="contact-form"
+          @submit.prevent="submitForm"
+        >
 
-          <div class="info-icon">
-            <Phone />
+          <div class="form-title">
+            <span>SEND US A MESSAGE</span>
+            <h2>Get In Touch</h2>
           </div>
 
-          <div>
-            <h3>
-              Call Us
-            </h3>
 
-            <p>
-              +855 712 447 679
-            </p>
+          <!-- Name + Email -->
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>
+                Your Name
+              </label>
+
+              <input
+                v-model="name"
+                type="text"
+                placeholder="Enter your name"
+                required
+              />
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Email
+              </label>
+
+              <input
+                v-model="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+              />
+
+            </div>
+
           </div>
 
-        </div>
 
+          <!-- Subject -->
+          <div class="form-group">
 
-        <div class="info-item">
+            <label>
+              Subject
+            </label>
 
-          <div class="info-icon">
-            <Mail />
+            <input
+              v-model="subject"
+              type="text"
+              placeholder="What is this about?"
+              required
+            />
+
           </div>
 
-          <div>
-            <h3>
-              Email Us
-            </h3>
 
-            <p>
-              Team3@email.com
-            </p>
+          <!-- Message -->
+          <div class="form-group">
+
+            <label>
+              Message
+            </label>
+
+            <textarea
+              v-model="message"
+              placeholder="Write your message..."
+              required
+            ></textarea>
+
           </div>
 
-        </div>
 
+          <!-- Submit -->
+          <button type="submit">
 
-        <div class="info-item">
+            <Send :size="18" />
 
-          <div class="info-icon">
-            <Clock />
-          </div>
+            Send Message
 
-          <div>
-            <h3>
-              Opening Hours
-            </h3>
+          </button>
 
-            <p>
-              8:00 AM – 9:00 PM
-            </p>
-          </div>
-
-        </div>
+        </form>
 
       </div>
-
-
-      <form
-        class="contact-form"
-        @submit.prevent="submitForm"
-      >
-
-        <div class="form-row">
-
-          <div>
-            <label>
-              Your Name
-            </label>
-
-            <input
-              v-model="name"
-              type="text"
-              placeholder="Enter your name"
-              required
-            />
-          </div>
-
-          <div>
-            <label>
-              Email
-            </label>
-
-            <input
-              v-model="email"
-              type="email"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-        </div>
-
-
-        <label>
-          Subject
-        </label>
-
-        <input
-          v-model="subject"
-          type="text"
-          placeholder="What is this about?"
-          required
-        />
-
-
-        <label>
-          Message
-        </label>
-
-        <textarea
-          v-model="message"
-          placeholder="Write your message..."
-          required
-        ></textarea>
-
-
-        <button type="submit">
-
-          <Send :size="18" />
-
-          Send Message
-
-        </button>
-
-      </form>
 
     </section>
 
   </main>
-
 </template>
+
 
 <script setup lang="ts">
 
-import {
-  ref
-} from 'vue'
+import { ref } from 'vue'
 
 import {
   MapPin,
@@ -191,10 +215,12 @@ import {
   Send
 } from 'lucide-vue-next'
 
+
 const name = ref('')
 const email = ref('')
 const subject = ref('')
 const message = ref('')
+
 
 function submitForm() {
 
@@ -210,195 +236,525 @@ function submitForm() {
 }
 
 </script>
+
+
 <style scoped>
-/* ================= PAGE LAYOUT ================= */
+
+/* ==================================================
+   PAGE
+================================================== */
+
 .contact-page {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 40px 20px 60px;
-  min-height: 85vh;
+  width: 100%;
+  background: #ffffff;
 }
 
-/* ================= HEADER SECTION ================= */
-.contact-header {
+
+/* ==================================================
+   HERO
+================================================== */
+
+.contact-hero {
+  min-height: 560px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   text-align: center;
-  margin-bottom: 48px;
+
+  padding: 80px 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fce4ec 0%,
+      #f8bbd0 50%,
+      #f3e5f5 100%
+    );
+
+  box-sizing: border-box;
 }
 
-.section-small {
-  font-size: 11px;
-  font-weight: 800;
-  color: #f48fb1;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
 
-.contact-header h1 {
-  font-size: 36px;
-  font-weight: 900;
-  color: #111111;
-  margin: 0 0 10px 0;
-}
+/* White label */
 
-.contact-header p {
+.hero-label {
+  width: min(840px, 90%);
+
+  padding: 10px 20px;
+
+  background: #ffffff;
+
+  border-radius: 30px;
+
+  color: #c93662;
+
   font-size: 16px;
-  color: #666666;
+  font-weight: 900;
+
+  letter-spacing: 2px;
+
+  box-shadow:
+    0 8px 20px rgba(216, 27, 96, 0.08);
+
+  margin-bottom: 28px;
+}
+
+
+/* Hero title */
+
+.contact-hero h1 {
   margin: 0;
+
+  max-width: 900px;
+
+  color: #16070d;
+
+  font-size: 62px;
+  line-height: 1.1;
+
+  font-weight: 900;
+
+  letter-spacing: -1px;
+}
+
+.contact-hero h1 span {
+  display: block;
+
+  color: #cf3865;
+}
+
+
+/* Hero description */
+
+.contact-hero p {
+  margin: 28px 0 0;
+
+  color: #5f6268;
+
+  font-size: 19px;
+
+  line-height: 1.8;
+
   font-weight: 500;
 }
 
-/* ================= CONTENT CONTAINER ================= */
+
+/* ==================================================
+   CONTACT SECTION
+================================================== */
+
+.contact-section {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 80px 20px 100px;
+
+  box-sizing: border-box;
+}
+
+
+/* ==================================================
+   CONTAINER
+================================================== */
+
 .contact-container {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 40px;
+
+  grid-template-columns: 1fr 1.4fr;
+
+  gap: 45px;
+
   align-items: start;
 }
 
-/* ================= CONTACT INFO (LEFT) ================= */
+
+/* ==================================================
+   CONTACT INFORMATION
+================================================== */
+
 .contact-info {
   display: flex;
+
   flex-direction: column;
+
   gap: 16px;
 }
+
+
+/* Information title */
+
+.info-title {
+  margin-bottom: 10px;
+}
+
+.info-title > span {
+  color: #d81b60;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  letter-spacing: 1.5px;
+}
+
+.info-title h2 {
+  margin: 8px 0;
+
+  font-size: 32px;
+
+  color: #171717;
+
+  font-weight: 900;
+}
+
+.info-title p {
+  margin: 0 0 15px;
+
+  color: #666666;
+
+  font-size: 15px;
+
+  line-height: 1.7;
+}
+
+
+/* ==================================================
+   INFORMATION CARD
+================================================== */
 
 .info-item {
   display: flex;
+
   align-items: center;
+
   gap: 16px;
+
   padding: 20px;
+
   background: #ffffff;
+
   border: 1px solid #f8bbd0;
+
   border-radius: 20px;
+
   transition: all 0.25s ease;
+
+  box-sizing: border-box;
 }
 
 .info-item:hover {
-  border-color: #f48fb1;
   transform: translateX(6px);
-  box-shadow: 0 8px 20px rgba(216, 27, 96, 0.06);
+
+  border-color: #f48fb1;
+
+  box-shadow:
+    0 10px 25px rgba(216, 27, 96, 0.08);
 }
 
+
+/* Icon */
+
 .info-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: #fdf2f8;
-  color: #d81b60;
+  width: 50px;
+  height: 50px;
+
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+
+  border-radius: 15px;
+
+  background: #fdf2f8;
+
+  color: #d81b60;
 }
 
+
+/* Text */
+
 .info-item h3 {
+  margin: 0 0 5px;
+
+  color: #151515;
+
   font-size: 15px;
+
   font-weight: 800;
-  color: #111111;
-  margin: 0 0 4px 0;
 }
 
 .info-item p {
-  font-size: 14px;
-  color: #666666;
   margin: 0;
+
+  color: #666666;
+
+  font-size: 14px;
+
   font-weight: 500;
 }
 
-/* ================= CONTACT FORM (RIGHT) ================= */
+
+/* ==================================================
+   FORM
+================================================== */
+
 .contact-form {
-  background: linear-gradient(180deg, #ffffff 0%, #fce4ec 100%);
+  padding: 35px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fce4ec 100%
+    );
+
   border: 1px solid #f8bbd0;
-  border-radius: 24px;
-  padding: 32px;
+
+  border-radius: 28px;
+
+  box-shadow:
+    0 15px 35px rgba(216, 27, 96, 0.07);
+
   display: flex;
+
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 10px 30px rgba(216, 27, 96, 0.05);
+
+  gap: 18px;
+
+  box-sizing: border-box;
 }
+
+
+/* Form title */
+
+.form-title {
+  margin-bottom: 5px;
+}
+
+.form-title span {
+  color: #d81b60;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: 1.5px;
+}
+
+.form-title h2 {
+  margin: 7px 0 0;
+
+  color: #171717;
+
+  font-size: 30px;
+
+  font-weight: 900;
+}
+
+
+/* ==================================================
+   FORM ROW
+================================================== */
 
 .form-row {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: 16px;
 }
 
-.contact-form label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #333333;
-  margin-bottom: 6px;
-  display: block;
+
+/* ==================================================
+   FORM GROUP
+================================================== */
+
+.form-group {
+  width: 100%;
 }
+
+.contact-form label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #333333;
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+
+/* ==================================================
+   INPUT + TEXTAREA
+================================================== */
 
 .contact-form input,
 .contact-form textarea {
   width: 100%;
-  padding: 12px 16px;
+
+  padding: 13px 16px;
+
   border: 1px solid #f8bbd0;
+
   border-radius: 14px;
-  font-size: 14px;
+
   background: #ffffff;
-  color: #1a1a1a;
-  outline: none;
+
+  color: #222222;
+
   font-family: inherit;
-  transition: all 0.25s ease;
+
+  font-size: 14px;
+
+  outline: none;
+
   box-sizing: border-box;
+
+  transition: all 0.25s ease;
+}
+
+.contact-form input {
+  height: 48px;
 }
 
 .contact-form textarea {
-  min-height: 130px;
+  min-height: 140px;
+
   resize: vertical;
 }
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #aaaaaa;
+}
+
+
+/* Focus */
 
 .contact-form input:focus,
 .contact-form textarea:focus {
   border-color: #d81b60;
-  box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.12);
+
+  box-shadow:
+    0 0 0 3px rgba(216, 27, 96, 0.12);
 }
 
-.contact-form button[type="submit"] {
+
+/* ==================================================
+   BUTTON
+================================================== */
+
+.contact-form button {
   display: flex;
+
   align-items: center;
   justify-content: center;
+
   gap: 10px;
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #e91e63 0%, #d81b60 100%);
-  color: #ffffff;
+
+  width: 100%;
+
+  padding: 15px 25px;
+
   border: none;
-  border-radius: 14px;
+
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e91e63 0%,
+      #d81b60 100%
+    );
+
+  color: #ffffff;
+
   font-size: 15px;
+
   font-weight: 800;
+
   cursor: pointer;
-  margin-top: 8px;
-  box-shadow: 0 8px 20px rgba(216, 27, 96, 0.25);
+
+  box-shadow:
+    0 8px 20px rgba(216, 27, 96, 0.25);
+
   transition: all 0.25s ease;
 }
 
-.contact-form button[type="submit"]:hover {
+.contact-form button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(216, 27, 96, 0.35);
+
+  box-shadow:
+    0 12px 28px rgba(216, 27, 96, 0.35);
 }
 
-.contact-form button[type="submit"]:active {
+.contact-form button:active {
   transform: translateY(0);
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 850px) {
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 900px) {
+
   .contact-container {
     grid-template-columns: 1fr;
   }
+
+  .contact-hero h1 {
+    font-size: 50px;
+  }
+
 }
 
-@media (max-width: 550px) {
+
+@media (max-width: 600px) {
+
+  .contact-hero {
+    min-height: 500px;
+
+    padding: 60px 16px;
+  }
+
+  .hero-label {
+    font-size: 12px;
+
+    letter-spacing: 1.2px;
+  }
+
+  .contact-hero h1 {
+    font-size: 38px;
+  }
+
+  .contact-hero p {
+    font-size: 16px;
+  }
+
+  .contact-hero p br {
+    display: none;
+  }
+
+  .contact-section {
+    padding: 55px 16px 70px;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }
 
   .contact-form {
-    padding: 20px;
+    padding: 22px;
   }
+
 }
+
 </style>
