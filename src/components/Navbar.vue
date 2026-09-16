@@ -7,7 +7,8 @@ import {
   CupSoda,
   Tag,
   Mail,
-  Info
+  Info,
+  Toolbox
 } from 'lucide-vue-next'
 
 import { useCart } from '../stores/cart'
@@ -61,7 +62,9 @@ function openSearch() {
         <Mail :size="20" />
         Contact
       </RouterLink>
-
+      <router-link to="/admin/orders">
+        <Toolbox :size="20" />
+        Admin Dashboard</router-link>
     </div>
 
 

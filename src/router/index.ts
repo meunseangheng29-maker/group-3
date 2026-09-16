@@ -15,6 +15,7 @@ import LoginPage from '../pages/LoginPage.vue'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage.vue'
 import RegisterPage from '../pages/RegisterPage.vue'
 import SearchPage from '../pages/SearchPage.vue'
+import AdminOrderPage from '../pages/AdminOrderPage.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -95,8 +96,13 @@ const router = createRouter({
       path: '/checkout',
       name: 'checkout',
       component: CheckoutPage
+    },
+    {
+    path: '/admin/orders',
+    name: 'AdminOrders',
+    component: AdminOrderPage // ឬផ្លូវរៀងខ្លួនតាម folder របស់អ្នក
     }
-  ],
+    ],
 
   scrollBehavior() {
     return {

@@ -44,9 +44,9 @@
           <h3>Contact</h3>
 
           <div class="contact-info">
-            <p>Phnom Penh, Cambodia</p>
-            <p>+855 12 345 678</p>
-            <p>team3@gmail.com</p>
+            <p>Touk Tla, SenSok, Phnom Penh, Cambodia</p>
+            <p>+855 71 24 47 679</p>
+            <p>team3Coffee@gmail.com</p>
           </div>
 
         </div>
