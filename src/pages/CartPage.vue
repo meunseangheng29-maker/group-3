@@ -1,93 +1,244 @@
-<template>
-  <div class="cart-container">
-    <h2>Shopping Cart</h2>
-
-    <!-- 1. Empty Cart State -->
-    <div v-if="cartItems.length === 0" class="empty-cart">
-      <p>Your cart is currently empty!</p>
-      <router-link to="/drinks" class="btn-shop">Explore Drinks</router-link>
-    </div>
-
-    <!-- 2. Cart Content State -->
-    <div v-else class="cart-content">
-      <div class="cart-items">
-        <div 
-          v-for="item in cartItems" 
-          :key="item.drink.id" 
-          class="cart-item-card"
-        >
-          <!-- Drink Image -->
-          <img :src="item.drink.image" :alt="item.drink.name" class="item-img" />
-
-          <!-- Drink Info -->
-          <div class="item-details">
-            <h3>{{ item.drink.name }}</h3>
-            <p class="category">{{ item.drink.category }}</p>
-            <p class="price">${{ item.drink.price.toFixed(2) }}</p>
-          </div>
-
-          <!-- Quantity Controls -->
-          <div class="quantity-controls">
-            <button @click="decreaseQuantity(item.drink.id)">-</button>
-            <span>{{ item.quantity }}</span>
-            <button @click="addToCart(item.drink)">+</button>
-          </div>
-
-          <!-- Item Total Price -->
-          <div class="item-total">
-            ${{ (item.drink.price * item.quantity).toFixed(2) }}
-          </div>
-
-          <!-- Remove Item Button -->
-          <button class="remove-btn" @click="removeFromCart(item.drink.id)">
-            <Trash2 :size="18" />
-          </button>
-        </div>
-      </div>
-
-      <!-- Order Summary Box -->
-      <div class="cart-summary">
-        <h3>Order Summary</h3>
-        <div class="summary-row">
-          <span>Total Quantity:</span>
-          <span>{{ cartCount }} {{ cartCount > 1 ? 'items' : 'item' }}</span>
-        </div>
-        <div class="summary-row total">
-          <span>Total Price:</span>
-          <span>${{ cartTotal.toFixed(2) }}</span>
-        </div>
-        <!-- ភ្ជាប់ Event @click ទៅកាន់ function goToCheckout -->
-        <button class="checkout-btn" @click="goToCheckout">Checkout</button>
-        <button class="clear-btn" @click="clearCart">Clear Cart</button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { Trash2 } from 'lucide-vue-next'
+
+import { useAuth } from '../stores/auth'
 import { useCart } from '../stores/cart'
 
 const router = useRouter()
+const auth = useAuth()
 
-const { 
-  cartItems, 
-  cartCount, 
-  cartTotal, 
-  addToCart, 
-  decreaseQuantity, 
-  removeFromCart, 
-  clearCart 
+const {
+  cartItems,
+  cartCount,
+  cartTotal,
+  addToCart,
+  decreaseQuantity,
+  removeFromCart,
+  clearCart
 } = useCart()
 
-function goToCheckout() {
-  router.push('/checkout')
+// =========================
+// CHECKOUT
+// =========================
+
+function checkout() {
+  console.log('Checkout clicked')
+  console.log('Logged in:', auth.isLoggedIn)
+
+  // If user is NOT logged in
+  if (!auth.isLoggedIn) {
+    router.push({
+      name: 'login',
+      query: {
+        redirect: '/checkout'
+      }
+    })
+
+    return
+  }
+
+  // If user IS logged in
+  router.push({
+    name: 'checkout'
+  })
 }
 </script>
 
+<template>
+  <div class="cart-container">
+
+    <h2>
+      Shopping Cart
+    </h2>
+
+    <!-- ========================= -->
+    <!-- EMPTY CART -->
+    <!-- ========================= -->
+
+    <div
+      v-if="cartItems.length === 0"
+      class="empty-cart"
+    >
+
+      <p>
+        Your cart is currently empty!
+      </p>
+
+      <router-link
+        to="/drinks"
+        class="btn-shop"
+      >
+        Explore Drinks
+      </router-link>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- CART CONTENT -->
+    <!-- ========================= -->
+
+    <div
+      v-else
+      class="cart-content"
+    >
+
+      <!-- ========================= -->
+      <!-- CART ITEMS -->
+      <!-- ========================= -->
+
+      <div class="cart-items">
+
+        <div
+          v-for="item in cartItems"
+          :key="item.drink.id"
+          class="cart-item-card"
+        >
+
+          <!-- IMAGE -->
+
+          <img
+            :src="item.drink.image"
+            :alt="item.drink.name"
+            class="item-img"
+          />
+
+          <!-- INFORMATION -->
+
+          <div class="item-details">
+
+            <h3>
+              {{ item.drink.name }}
+            </h3>
+
+            <p class="category">
+              {{ item.drink.category }}
+            </p>
+
+            <p class="price">
+              ${{ item.drink.price.toFixed(2) }}
+            </p>
+
+          </div>
+
+          <!-- ========================= -->
+          <!-- QUANTITY -->
+          <!-- ========================= -->
+
+          <div class="quantity-controls">
+
+            <button
+              @click="decreaseQuantity(item.drink.id)"
+            >
+              -
+            </button>
+
+            <span>
+              {{ item.quantity }}
+            </span>
+
+            <button
+              @click="addToCart(item.drink)"
+            >
+              +
+            </button>
+
+          </div>
+
+          <!-- ========================= -->
+          <!-- ITEM TOTAL -->
+          <!-- ========================= -->
+
+          <div class="item-total">
+            ${{
+              (
+                item.drink.price *
+                item.quantity
+              ).toFixed(2)
+            }}
+          </div>
+
+          <!-- ========================= -->
+          <!-- REMOVE -->
+          <!-- ========================= -->
+
+          <button
+            class="remove-btn"
+            @click="removeFromCart(item.drink.id)"
+          >
+            <Trash2 :size="18" />
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- ========================= -->
+      <!-- ORDER SUMMARY -->
+      <!-- ========================= -->
+
+      <div class="cart-summary">
+
+        <h3>
+          Order Summary
+        </h3>
+
+        <div class="summary-row">
+
+          <span>
+            Total Quantity:
+          </span>
+
+          <span>
+            {{ cartCount }}
+            {{ cartCount > 1 ? 'items' : 'item' }}
+          </span>
+
+        </div>
+
+        <div class="summary-row total">
+
+          <span>
+            Total Price:
+          </span>
+
+          <span>
+            ${{ cartTotal.toFixed(2) }}
+          </span>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- CHECKOUT -->
+        <!-- ========================= -->
+
+        <button
+          class="checkout-btn"
+          @click="checkout"
+        >
+          Checkout
+        </button>
+
+        <!-- ========================= -->
+        <!-- CLEAR CART -->
+        <!-- ========================= -->
+
+        <button
+          class="clear-btn"
+          @click="clearCart"
+        >
+          Clear Cart
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</template>
+
 <style scoped>
-/* ================= MAIN CONTAINER ================= */
+
 .cart-container {
   max-width: 1100px;
   margin: 40px auto;
@@ -102,7 +253,10 @@ function goToCheckout() {
   margin-bottom: 24px;
 }
 
-/* ================= EMPTY CART STATE ================= */
+/* =========================
+   EMPTY CART
+========================= */
+
 .empty-cart {
   text-align: center;
   padding: 80px 20px;
@@ -122,21 +276,32 @@ function goToCheckout() {
 .btn-shop {
   display: inline-block;
   padding: 12px 28px;
-  background: linear-gradient(135deg, #e91e63 0%, #d81b60 100%);
+  background: linear-gradient(
+    135deg,
+    #e91e63 0%,
+    #d81b60 100%
+  );
   color: white;
   border-radius: 14px;
   text-decoration: none;
   font-weight: 700;
-  box-shadow: 0 8px 20px rgba(216, 27, 96, 0.25);
+  box-shadow:
+    0 8px 20px
+    rgba(216, 27, 96, 0.25);
   transition: all 0.25s ease;
 }
 
 .btn-shop:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(216, 27, 96, 0.35);
+  box-shadow:
+    0 12px 25px
+    rgba(216, 27, 96, 0.35);
 }
 
-/* ================= CART CONTENT LAYOUT ================= */
+/* =========================
+   CART CONTENT
+========================= */
+
 .cart-content {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -149,7 +314,10 @@ function goToCheckout() {
   gap: 16px;
 }
 
-/* ================= CART ITEM CARD ================= */
+/* =========================
+   CART ITEM
+========================= */
+
 .cart-item-card {
   display: flex;
   align-items: center;
@@ -163,8 +331,14 @@ function goToCheckout() {
 
 .cart-item-card:hover {
   border-color: #f48fb1;
-  box-shadow: 0 8px 20px rgba(216, 27, 96, 0.06);
+  box-shadow:
+    0 8px 20px
+    rgba(216, 27, 96, 0.06);
 }
+
+/* =========================
+   IMAGE
+========================= */
 
 .item-img {
   width: 80px;
@@ -173,6 +347,10 @@ function goToCheckout() {
   border-radius: 14px;
   background: #fdf2f8;
 }
+
+/* =========================
+   DETAILS
+========================= */
 
 .item-details {
   flex: 1;
@@ -201,7 +379,10 @@ function goToCheckout() {
   font-weight: 600;
 }
 
-/* ================= QUANTITY CONTROLS ================= */
+/* =========================
+   QUANTITY
+========================= */
+
 .quantity-controls {
   display: flex;
   align-items: center;
@@ -225,7 +406,9 @@ function goToCheckout() {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 2px 6px
+    rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
 
@@ -242,6 +425,10 @@ function goToCheckout() {
   font-size: 14px;
 }
 
+/* =========================
+   ITEM TOTAL
+========================= */
+
 .item-total {
   font-weight: 800;
   font-size: 16px;
@@ -249,6 +436,10 @@ function goToCheckout() {
   min-width: 70px;
   text-align: right;
 }
+
+/* =========================
+   REMOVE
+========================= */
 
 .remove-btn {
   background: none;
@@ -268,14 +459,23 @@ function goToCheckout() {
   color: #d32f2f;
 }
 
-/* ================= ORDER SUMMARY BOX ================= */
+/* =========================
+   SUMMARY
+========================= */
+
 .cart-summary {
   padding: 24px;
   border: 1px solid #f8bbd0;
   border-radius: 24px;
-  background: linear-gradient(180deg, #ffffff 0%, #fce4ec 100%);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fce4ec 100%
+  );
   height: fit-content;
-  box-shadow: 0 10px 25px rgba(216, 27, 96, 0.05);
+  box-shadow:
+    0 10px 25px
+    rgba(216, 27, 96, 0.05);
 }
 
 .cart-summary h3 {
@@ -284,6 +484,10 @@ function goToCheckout() {
   color: #111;
   margin: 0 0 18px 0;
 }
+
+/* =========================
+   SUMMARY ROW
+========================= */
 
 .summary-row {
   display: flex;
@@ -303,10 +507,18 @@ function goToCheckout() {
   margin-top: 16px;
 }
 
+/* =========================
+   CHECKOUT BUTTON
+========================= */
+
 .checkout-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #e91e63 0%, #d81b60 100%);
+  background: linear-gradient(
+    135deg,
+    #e91e63 0%,
+    #d81b60 100%
+  );
   color: white;
   border: none;
   border-radius: 14px;
@@ -315,14 +527,22 @@ function goToCheckout() {
   cursor: pointer;
   margin-top: 10px;
   margin-bottom: 10px;
-  box-shadow: 0 8px 20px rgba(216, 27, 96, 0.25);
+  box-shadow:
+    0 8px 20px
+    rgba(216, 27, 96, 0.25);
   transition: all 0.25s ease;
 }
 
 .checkout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(216, 27, 96, 0.35);
+  box-shadow:
+    0 12px 25px
+    rgba(216, 27, 96, 0.35);
 }
+
+/* =========================
+   CLEAR
+========================= */
 
 .clear-btn {
   width: 100%;
@@ -342,7 +562,10 @@ function goToCheckout() {
   color: #d32f2f;
 }
 
-/* Responsive */
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media (max-width: 850px) {
   .cart-content {
     grid-template-columns: 1fr;
@@ -353,8 +576,10 @@ function goToCheckout() {
   .cart-item-card {
     flex-wrap: wrap;
   }
+
   .item-total {
     text-align: left;
   }
 }
+
 </style>

@@ -16,6 +16,7 @@ import ForgotPasswordPage from '../pages/ForgotPasswordPage.vue'
 import RegisterPage from '../pages/RegisterPage.vue'
 import SearchPage from '../pages/SearchPage.vue'
 import AdminOrderPage from '../pages/AdminOrderPage.vue'
+import { useAuth } from "../stores/auth";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -95,7 +96,10 @@ const router = createRouter({
     {
       path: '/checkout',
       name: 'checkout',
-      component: CheckoutPage
+      component: CheckoutPage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
     path: '/admin/orders',
@@ -110,6 +114,23 @@ const router = createRouter({
     }
   }
 })
+
+// Protect routes that require login
+router.beforeEach((to) => {
+  const auth = useAuth();
+
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    return {
+      name: "login",
+
+      query: {
+        redirect: to.fullPath,
+      },
+    };
+  }
+
+  return true;
+});
 
 export default router
 

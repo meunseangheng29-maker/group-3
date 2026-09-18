@@ -1,28 +1,32 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+
 import App from './App.vue'
 import router from './router'
 
-// ១. Import FontAwesome Core និង Component
+// =====================================================
+// FONT AWESOME
+// =====================================================
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-// ២. Import Icon ទាំងអស់ដែលអ្នកបានប្រើប្រាស់ក្នុង Project
-import { 
-  faMugHot, 
-  faHouse, 
-  faBookOpen, 
-  faCartShopping, 
-  faToolbox, 
-  faTrashCan, 
-  faBoxOpen, 
-  faHashtag, 
-  faTrash, 
-  faUser, 
-  faPhone, 
-  faLocationDot, 
-  faCreditCard, 
-  faCalendarDays, 
-  faBasketShopping, 
+import {
+  faMugHot,
+  faHouse,
+  faBookOpen,
+  faCartShopping,
+  faToolbox,
+  faTrashCan,
+  faBoxOpen,
+  faHashtag,
+  faTrash,
+  faUser,
+  faPhone,
+  faLocationDot,
+  faCreditCard,
+  faCalendarDays,
+  faBasketShopping,
   faReceipt,
   faCashRegister,
   faTruckFast,
@@ -33,19 +37,49 @@ import {
   faMoneyBill1
 } from '@fortawesome/free-solid-svg-icons'
 
-// ៣. បញ្ចូល Icon ទាំងអស់នោះចូលទៅក្នុង library
 library.add(
-  faMugHot, faHouse, faBookOpen, faCartShopping, faToolbox, 
-  faTrashCan, faBoxOpen, faHashtag, faTrash, faUser, 
-  faPhone, faLocationDot, faCreditCard, faCalendarDays, 
-  faBasketShopping, faReceipt, faCashRegister, faTruckFast,
-  faWallet, faQrcode, faMoneyBillWave, faCircleCheck, faMoneyBill1
+  faMugHot,
+  faHouse,
+  faBookOpen,
+  faCartShopping,
+  faToolbox,
+  faTrashCan,
+  faBoxOpen,
+  faHashtag,
+  faTrash,
+  faUser,
+  faPhone,
+  faLocationDot,
+  faCreditCard,
+  faCalendarDays,
+  faBasketShopping,
+  faReceipt,
+  faCashRegister,
+  faTruckFast,
+  faWallet,
+  faQrcode,
+  faMoneyBillWave,
+  faCircleCheck,
+  faMoneyBill1
 )
+
+// =====================================================
+// CREATE APP
+// =====================================================
 
 const app = createApp(App)
 
-// ៤. ចុះឈ្មោះ FontAwesomeIcon ជា Global Component
-app.component('font-awesome-icon', FontAwesomeIcon)
+// Pinia
+app.use(createPinia())
 
+// Router
 app.use(router)
+
+// FontAwesome global component
+app.component(
+  'font-awesome-icon',
+  FontAwesomeIcon
+)
+
+// Mount
 app.mount('#app')

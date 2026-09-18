@@ -1,36 +1,33 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
 import {
   Heart,
   ShoppingBag,
   ArrowRight
 } from 'lucide-vue-next'
 
-import { computed, ref } from 'vue'
-
 import { drinks } from '../data/Drink'
+import type { Drink } from '../data/Drink'
 import { useCart } from '../stores/cart'
 
-
-// =====================================================
+// =========================
 // CART
-// =====================================================
+// =========================
+const { addToCart: addDrinkToCart } = useCart()
 
-const { addToCart } = useCart()
-
-
-// =====================================================
+// =========================
 // OFFERS
-// =====================================================
-
+// =========================
 const offers = computed(() => {
-  return drinks.filter(drink => drink.originalPrice)
+  return drinks.filter(
+    drink => drink.originalPrice !== undefined
+  )
 })
 
-
-// =====================================================
+// =========================
 // DISCOUNT
-// =====================================================
-
+// =========================
 function discountPercent(
   price: number,
   originalPrice: number
@@ -40,171 +37,166 @@ function discountPercent(
   )
 }
 
-
-// =====================================================
-// FAVORITES
-// =====================================================
-
-const favorites = ref<number[]>([])
-
-function isFavorite(drinkId: number) {
-  return favorites.value.includes(drinkId)
+// =========================
+// ADD TO CART
+// =========================
+function addToCart(drink: Drink) {
+  addDrinkToCart({
+    ...drink,
+    image: drink.image
+  })
 }
 
-function toggleFavorite(drinkId: number) {
-  if (isFavorite(drinkId)) {
+// =========================
+// ORDER NOW
+// =========================
+function handleOrderNow() {
+  if (offers.value.length === 0) {
+    return
+  }
+
+  const drink = offers.value[0]
+
+  // Add the featured drink with its image
+  addDrinkToCart({
+    ...drink,
+    image: drink.image
+  })
+}
+
+// =========================
+// FAVORITES
+// =========================
+const favorites = ref<number[]>([])
+
+function isFavorite(id: number) {
+  return favorites.value.includes(id)
+}
+
+function toggleFavorite(id: number) {
+  if (isFavorite(id)) {
     favorites.value = favorites.value.filter(
-      id => id !== drinkId
+      item => item !== id
     )
   } else {
-    favorites.value.push(drinkId)
+    favorites.value.push(id)
   }
 }
 </script>
 
-
 <template>
-
   <main class="offers-page">
 
-
-    <!-- =================================================
-         HERO
-    ================================================= -->
+    <!-- ================================================= -->
+    <!-- HERO -->
+    <!-- ================================================= -->
 
     <section class="offers-hero">
+      <div class="offers-hero-content">
 
-      <div class="hero-label">
-        ✨ LIMITED TIME OFFERS
+        <span class="hero-label">
+          SPECIAL OFFERS
+        </span>
+
+        <h1>
+          Great Drinks,
+          <span>Better Prices</span>
+        </h1>
+
+        <p>
+          Enjoy your favorite drinks with
+          special discounts.
+        </p>
+
+        
+
       </div>
-
-      <h1>
-        Special
-        <span>Offers</span>
-      </h1>
-
-      <p>
-        Treat yourself to something delicious.
-        Enjoy our best drinks at special prices.
-      </p>
-
     </section>
 
 
-
-    <!-- =================================================
-         FEATURED OFFER
-    ================================================= -->
+    <!-- ================================================= -->
+    <!-- FEATURED OFFER -->
+    <!-- ================================================= -->
 
     <section
       v-if="offers.length > 0"
-      class="featured-offer"
+      class="featured-section"
     >
 
+      <div class="section-title">
+        <span>
+          FEATURED OFFER
+        </span>
 
-      <!-- IMAGE -->
-
-      <div class="featured-image">
-
-        <img
-          :src="offers[0].image"
-          :alt="offers[0].name"
-        />
+        <h2>
+          Today's Special
+        </h2>
+      </div>
 
 
-        <!-- DISCOUNT -->
+      <div class="featured-card">
 
-        <div class="discount-circle">
+        <!-- IMAGE -->
 
-          <strong>
-            {{
+        <div class="featured-image">
+
+          <img
+            :src="offers[0].image"
+            :alt="offers[0].name"
+          />
+
+          <div class="discount-badge">
+            -{{
               discountPercent(
                 offers[0].price,
                 offers[0].originalPrice!
               )
             }}%
-          </strong>
+          </div>
 
-          <span>
-            OFF
+        </div>
+
+
+        <!-- INFORMATION -->
+
+        <div class="featured-info">
+
+          <span class="offer-label">
+            {{ offers[0].category }}
           </span>
 
-        </div>
+          <h3>
+            {{ offers[0].name }}
+          </h3>
 
-      </div>
-
-
-
-      <!-- CONTENT -->
-
-      <div class="featured-content">
-
-        <span class="featured-label">
-          TODAY'S SPECIAL
-        </span>
+          <p>
+            {{ offers[0].description }}
+          </p>
 
 
-        <h2>
-          {{ offers[0].name }}
-        </h2>
+          <!-- PRICE -->
+
+          <div class="price">
+
+            <span class="old-price">
+              ${{ offers[0].originalPrice?.toFixed(2) }}
+            </span>
+
+            <span class="current-price">
+              ${{ offers[0].price.toFixed(2) }}
+            </span>
+
+          </div>
 
 
-        <p>
-          {{ offers[0].description }}
-        </p>
-
-
-        <!-- PRICE -->
-
-        <div class="featured-price">
-
-          <strong>
-            ${{ offers[0].price.toFixed(2) }}
-          </strong>
-
-          <del>
-            ${{ offers[0].originalPrice?.toFixed(2) }}
-          </del>
-
-        </div>
-
-
-        <!-- ACTIONS -->
-
-        <div class="featured-actions">
-
-
-          <!-- ORDER NOW -->
-
-          <RouterLink
-            to="/drinks"
-            class="buy-btn"
-          >
-
-            Order Now
-
-            <ShoppingBag :size="18" />
-
-          </RouterLink>
-
-
-          <!-- FAVORITE -->
+          <!-- ADD TO CART -->
 
           <button
-            class="heart-btn"
-            @click="toggleFavorite(offers[0].id)"
-            title="Add to favorites"
+            class="featured-buy"
+            @click="addToCart(offers[0])"
           >
-
-            <Heart
-              :size="21"
-              :fill="
-                isFavorite(offers[0].id)
-                  ? 'currentColor'
-                  : 'none'
-              "
-            />
-
+            <ShoppingBag :size="19" />
+            Add to Cart
           </button>
 
         </div>
@@ -214,59 +206,32 @@ function toggleFavorite(drinkId: number) {
     </section>
 
 
+    <!-- ================================================= -->
+    <!-- ALL OFFERS -->
+    <!-- ================================================= -->
 
-    <!-- =================================================
-         ALL OFFERS
-    ================================================= -->
-
-    <section class="all-offers">
-
-
-      <!-- SECTION TITLE -->
+    <section class="offers-section">
 
       <div class="section-title">
 
-        <div>
+        <span>
+          MORE DEALS
+        </span>
 
-          <span>
-            MORE DEALS
-          </span>
-
-          <h2>
-            Grab Your Favorite
-          </h2>
-
-        </div>
-
-
-        <RouterLink to="/drinks">
-
-          View all drinks
-
-          <ArrowRight :size="17" />
-
-        </RouterLink>
+        <h2>
+          All Offers
+        </h2>
 
       </div>
 
 
-
-      <!-- =================================================
-           OFFERS GRID
-      ================================================= -->
-
-      <div
-        v-if="offers.length > 0"
-        class="offers-grid"
-      >
-
+      <div class="offers-grid">
 
         <article
           v-for="drink in offers"
           :key="drink.id"
           class="offer-card"
         >
-
 
           <!-- IMAGE -->
 
@@ -278,30 +243,27 @@ function toggleFavorite(drinkId: number) {
             />
 
 
-            <!-- SALE -->
+            <!-- DISCOUNT -->
 
-            <span class="sale-badge">
-
-              {{
+            <div class="discount-badge">
+              -{{
                 discountPercent(
                   drink.price,
                   drink.originalPrice!
                 )
-              }}% OFF
+              }}%
+            </div>
 
-            </span>
 
-
-            <!-- HEART -->
+            <!-- FAVORITE -->
 
             <button
-              class="card-heart"
+              class="heart-btn"
               @click="toggleFavorite(drink.id)"
-              title="Add to favorites"
             >
 
               <Heart
-                :size="18"
+                :size="19"
                 :fill="
                   isFavorite(drink.id)
                     ? 'currentColor'
@@ -314,62 +276,48 @@ function toggleFavorite(drinkId: number) {
           </div>
 
 
-
           <!-- INFORMATION -->
 
           <div class="offer-info">
 
-
-            <!-- CATEGORY -->
-
-            <span class="category">
+            <span class="offer-label">
               {{ drink.category }}
             </span>
-
-
-            <!-- NAME -->
 
             <h3>
               {{ drink.name }}
             </h3>
-
-
-            <!-- DESCRIPTION -->
 
             <p>
               {{ drink.description }}
             </p>
 
 
-            <!-- FOOTER -->
-
-            <div class="offer-footer">
-
+            <div class="card-bottom">
 
               <!-- PRICE -->
 
-              <div class="prices">
+              <div class="price">
 
-                <strong>
-                  ${{ drink.price.toFixed(2) }}
-                </strong>
-
-                <del>
+                <span class="old-price">
                   ${{ drink.originalPrice?.toFixed(2) }}
-                </del>
+                </span>
+
+                <span class="current-price">
+                  ${{ drink.price.toFixed(2) }}
+                </span>
 
               </div>
 
 
-              <!-- ADD TO CART -->
+              <!-- SHOPPING BAG -->
 
               <button
                 class="plus-btn"
                 @click="addToCart(drink)"
-                title="Add to cart"
               >
 
-                <ShoppingBag :size="18" />
+                <ShoppingBag :size="20" />
 
               </button>
 
@@ -381,36 +329,9 @@ function toggleFavorite(drinkId: number) {
 
       </div>
 
-
-
-      <!-- =================================================
-           NO OFFERS
-      ================================================= -->
-
-      <div
-        v-else
-        class="no-offers"
-      >
-
-        <h2>
-          No offers available
-        </h2>
-
-        <p>
-          Please check again later for special offers.
-        </p>
-
-
-        <RouterLink to="/drinks">
-          Browse Drinks
-        </RouterLink>
-
-      </div>
-
     </section>
 
   </main>
-
 </template>
 
 
@@ -421,9 +342,9 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .offers-page {
-  width: 100%;
   min-height: 100vh;
-  background: #ffffff;
+  background: #fdfbfb;
+  color: #222;
 }
 
 
@@ -432,75 +353,27 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .offers-hero {
-  min-height: 520px;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  padding: 70px 20px;
-
   background:
     linear-gradient(
       135deg,
       #fce4ec 0%,
-      #f3c1d5 50%,
-      #f8dce9 100%
+      #f8bbd0 50%,
+      #f3e5f5 100%
     );
 
-  position: relative;
+  padding: 85px 20px;
 
-  overflow: hidden;
+  text-align: center;
+
+  border-bottom: 1px solid #f8bbd0;
+
+  margin-bottom: 45px;
 }
 
 
-/* Decorative circle */
-
-.offers-hero::before {
-  content: "";
-
-  position: absolute;
-
-  width: 350px;
-  height: 350px;
-
-  border-radius: 50%;
-
-  background: rgba(
-    255,
-    255,
-    255,
-    0.15
-  );
-
-  top: -180px;
-  left: -100px;
-}
-
-
-.offers-hero::after {
-  content: "";
-
-  position: absolute;
-
-  width: 300px;
-  height: 300px;
-
-  border-radius: 50%;
-
-  background: rgba(
-    255,
-    255,
-    255,
-    0.12
-  );
-
-  bottom: -150px;
-  right: -80px;
+.offers-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 
@@ -509,33 +382,27 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .hero-label {
-  position: relative;
+  display: inline-block;
 
-  z-index: 2;
+  padding: 7px 16px;
 
-  background: #ffffff;
+  border-radius: 20px;
 
-  color: #c92f61;
+  background: white;
 
-  padding: 11px 40px;
+  color: #d81b60;
 
-  border-radius: 30px;
-
-  font-size: 14px;
+  font-size: 12px;
 
   font-weight: 800;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 
   box-shadow:
-    0 8px 25px rgba(
-      0,
-      0,
-      0,
-      0.05
-    );
+    0 4px 15px
+    rgba(216, 27, 96, 0.08);
 }
 
 
@@ -544,28 +411,24 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .offers-hero h1 {
-  position: relative;
+  font-size: 48px;
 
-  z-index: 2;
+  line-height: 1.15;
 
-  margin: 0;
+  margin: 0 auto 20px;
 
-  font-size: 64px;
-
-  line-height: 1.05;
+  color: #251014;
 
   font-weight: 900;
 
-  color: #18090e;
-
-  letter-spacing: -2px;
+  letter-spacing: -1px;
 }
 
 
 .offers-hero h1 span {
-  display: block;
+  color: #d81b60;
 
-  color: #ce3764;
+  display: block;
 }
 
 
@@ -574,300 +437,78 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .offers-hero p {
-  position: relative;
+  max-width: 650px;
 
-  z-index: 2;
+  margin: 0 auto;
 
-  max-width: 700px;
+  color: #666;
 
-  margin: 28px auto 0;
-
-  font-size: 18px;
+  font-size: 17px;
 
   line-height: 1.7;
-
-  color: #666666;
 }
 
 
 /* =====================================================
-   FEATURE OFFER
+   HERO BUTTON
 ===================================================== */
 
-.featured-offer {
-  max-width: 1200px;
+.hero-button {
+  margin-top: 25px;
 
-  margin: 60px auto 70px;
+  display: inline-flex;
 
-  display: grid;
+  align-items: center;
 
-  grid-template-columns:
-    1.1fr 1fr;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 12px 22px;
+
+  border: 1px solid #d81b60;
+
+  border-radius: 12px;
 
   background:
     linear-gradient(
       135deg,
-      #fff2e5,
-      #fffaf6
+      #e91e63 0%,
+      #d81b60 100%
     );
-
-  border-radius: 25px;
-
-  overflow: hidden;
-
-  min-height: 380px;
-}
-
-
-/* =====================================================
-   FEATURE IMAGE
-===================================================== */
-
-.featured-image {
-  position: relative;
-
-  min-height: 380px;
-}
-
-
-.featured-image img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  display: block;
-}
-
-
-/* =====================================================
-   DISCOUNT CIRCLE
-===================================================== */
-
-.discount-circle {
-  position: absolute;
-
-  top: 25px;
-  left: 25px;
-
-  width: 90px;
-  height: 90px;
-
-  border-radius: 50%;
-
-  background: #df0874;
 
   color: white;
-
-  border: 4px solid white;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  justify-content: center;
-
-  box-shadow:
-    0 8px 20px rgba(
-      0,
-      0,
-      0,
-      0.15
-    );
-}
-
-
-.discount-circle strong {
-  font-size: 24px;
-}
-
-
-.discount-circle span {
-  font-size: 10px;
-
-  font-weight: 700;
-}
-
-
-/* =====================================================
-   FEATURE CONTENT
-===================================================== */
-
-.featured-content {
-  padding: 50px;
-
-  display: flex;
-
-  flex-direction: column;
-
-  justify-content: center;
-}
-
-
-.featured-label {
-  width: fit-content;
-
-  background: #ffe1cb;
-
-  color: #df0874;
-
-  padding: 7px 12px;
-
-  border-radius: 20px;
-
-  font-size: 10px;
-
-  font-weight: 800;
-}
-
-
-.featured-content h2 {
-  font-size: 38px;
-
-  margin: 15px 0 10px;
-
-  line-height: 1.1;
-}
-
-
-.featured-content p {
-  color: #666666;
-
-  line-height: 1.6;
-
-  max-width: 420px;
 
   font-size: 14px;
-}
-
-
-/* =====================================================
-   FEATURE PRICE
-===================================================== */
-
-.featured-price {
-  display: flex;
-
-  align-items: center;
-
-  gap: 14px;
-
-  margin: 12px 0 25px;
-}
-
-
-.featured-price strong {
-  font-size: 32px;
-
-  color: #df0874;
-}
-
-
-.featured-price del {
-  color: #888888;
-
-  font-size: 18px;
-}
-
-
-/* =====================================================
-   FEATURE BUTTONS
-===================================================== */
-
-.featured-actions {
-  display: flex;
-
-  gap: 10px;
-}
-
-
-/* =====================================================
-   ORDER NOW
-===================================================== */
-
-.buy-btn {
-  border: none;
-
-  background: #df0874;
-
-  color: white;
-
-  border-radius: 11px;
-
-  padding: 14px 23px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 9px;
 
   font-weight: 700;
 
   cursor: pointer;
 
-  text-decoration: none;
-
-  transition: 0.2s;
+  transition: all 0.25s ease;
 }
 
 
-.buy-btn:hover {
-  background: #c51665;
-
+.hero-button:hover {
   transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px
+    rgba(216, 27, 96, 0.2);
 }
 
 
 /* =====================================================
-   FEATURE HEART
+   SECTION
 ===================================================== */
 
-.heart-btn {
-  width: 49px;
-  height: 49px;
-
-  border: none;
-
-  background: white;
-
-  color: #df0874;
-
-  border-radius: 11px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  cursor: pointer;
-
-  transition: 0.2s;
-}
-
-
-.heart-btn:hover {
-  background: #fff0f6;
-
-  transform: scale(1.05);
-}
-
-
-/* =====================================================
-   ALL OFFERS
-===================================================== */
-
-.all-offers {
+.featured-section,
+.offers-section {
   max-width: 1200px;
 
   margin: 0 auto;
 
-  padding: 0 20px 80px;
+  padding: 20px 20px 60px;
 }
 
 
@@ -876,20 +517,14 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .section-title {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: flex-end;
-
-  margin-bottom: 23px;
+  margin-bottom: 30px;
 }
 
 
 .section-title span {
-  color: #df0874;
+  color: #d81b60;
 
-  font-size: 10px;
+  font-size: 12px;
 
   font-weight: 800;
 
@@ -898,35 +533,222 @@ function toggleFavorite(drinkId: number) {
 
 
 .section-title h2 {
-  margin: 5px 0 0;
+  margin: 8px 0 0;
 
-  font-size: 29px;
+  color: #251014;
 
-  color: #111111;
+  font-size: 30px;
+
+  font-weight: 900;
 }
 
 
-.section-title a {
+/* =====================================================
+   FEATURED CARD
+===================================================== */
+
+.featured-card {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  background: #ffffff;
+
+  border: 1px solid #f8bbd0;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 8px 25px
+    rgba(216, 27, 96, 0.07);
+}
+
+
+/* =====================================================
+   FEATURED IMAGE
+===================================================== */
+
+.featured-image {
+  position: relative;
+
+  height: 400px;
+}
+
+
+.featured-image img {
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* =====================================================
+   FEATURED INFORMATION
+===================================================== */
+
+.featured-info {
+  padding: 40px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+
+.offer-label {
+  color: #d81b60;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+
+.featured-info h3 {
+  margin: 12px 0;
+
+  color: #251014;
+
+  font-size: 32px;
+
+  font-weight: 900;
+}
+
+
+.featured-info p {
+  color: #666;
+
+  line-height: 1.7;
+
+  font-size: 15px;
+}
+
+
+/* =====================================================
+   DISCOUNT BADGE
+===================================================== */
+
+.discount-badge {
+  position: absolute;
+
+  top: 15px;
+
+  left: 15px;
+
+  padding: 7px 12px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e91e63 0%,
+      #d81b60 100%
+    );
+
+  color: white;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  box-shadow:
+    0 5px 15px
+    rgba(216, 27, 96, 0.2);
+}
+
+
+/* =====================================================
+   PRICE
+===================================================== */
+
+.price {
   display: flex;
 
   align-items: center;
 
-  gap: 5px;
+  gap: 10px;
 
-  color: #df0874;
+  margin: 15px 0;
+}
 
-  text-decoration: none;
+
+.current-price {
+  color: #d81b60;
+
+  font-size: 20px;
+
+  font-weight: 900;
+}
+
+
+.old-price {
+  color: #999;
+
+  font-size: 14px;
+
+  text-decoration: line-through;
+}
+
+
+/* =====================================================
+   FEATURED BUY BUTTON
+===================================================== */
+
+.featured-buy {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  width: fit-content;
+
+  padding: 11px 20px;
+
+  border: 1px solid #d81b60;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e91e63 0%,
+      #d81b60 100%
+    );
+
+  color: white;
 
   font-size: 14px;
 
   font-weight: 700;
 
-  transition: 0.2s;
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 16px
+    rgba(216, 27, 96, 0.2);
+
+  transition: all 0.25s ease;
 }
 
 
-.section-title a:hover {
-  gap: 9px;
+.featured-buy:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px
+    rgba(216, 27, 96, 0.25);
 }
 
 
@@ -938,9 +760,12 @@ function toggleFavorite(drinkId: number) {
   display: grid;
 
   grid-template-columns:
-    repeat(3, 1fr);
+    repeat(
+      auto-fill,
+      minmax(240px, 1fr)
+    );
 
-  gap: 22px;
+  gap: 24px;
 }
 
 
@@ -949,15 +774,19 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .offer-card {
-  border: 1px solid #eeeeee;
+  background: #ffffff;
 
-  border-radius: 18px;
+  border: 1px solid #f8bbd0;
+
+  border-radius: 16px;
 
   overflow: hidden;
 
-  background: white;
+  box-shadow:
+    0 6px 20px
+    rgba(216, 27, 96, 0.05);
 
-  transition: 0.25s;
+  transition: all 0.25s ease;
 }
 
 
@@ -965,12 +794,8 @@ function toggleFavorite(drinkId: number) {
   transform: translateY(-5px);
 
   box-shadow:
-    0 15px 35px rgba(
-      0,
-      0,
-      0,
-      0.09
-    );
+    0 10px 25px
+    rgba(216, 27, 96, 0.10);
 }
 
 
@@ -979,11 +804,9 @@ function toggleFavorite(drinkId: number) {
 ===================================================== */
 
 .offer-image {
-  height: 260px;
-
   position: relative;
 
-  background: #f7f7f7;
+  height: 230px;
 
   overflow: hidden;
 }
@@ -991,64 +814,34 @@ function toggleFavorite(drinkId: number) {
 
 .offer-image img {
   width: 100%;
+
   height: 100%;
 
   object-fit: cover;
 
-  transition: 0.3s;
+  transition: transform 0.3s ease;
 }
 
 
-.offer-card:hover
-.offer-image img {
-  transform: scale(1.05);
-}
-
-
-/* =====================================================
-   SALE BADGE
-===================================================== */
-
-.sale-badge {
-  position: absolute;
-
-  top: 13px;
-  left: 13px;
-
-  background: #df0874;
-
-  color: white;
-
-  padding: 6px 10px;
-
-  border-radius: 7px;
-
-  font-size: 10px;
-
-  font-weight: 800;
+.offer-card:hover .offer-image img {
+  transform: scale(1.04);
 }
 
 
 /* =====================================================
-   CARD HEART
+   HEART BUTTON
 ===================================================== */
 
-.card-heart {
+.heart-btn {
   position: absolute;
 
-  top: 11px;
-  right: 11px;
+  top: 15px;
 
-  width: 36px;
-  height: 36px;
+  right: 15px;
 
-  border: none;
+  width: 40px;
 
-  background: white;
-
-  color: #df0874;
-
-  border-radius: 50%;
+  height: 40px;
 
   display: flex;
 
@@ -1056,124 +849,96 @@ function toggleFavorite(drinkId: number) {
 
   justify-content: center;
 
+  border: 1px solid #f8bbd0;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #d81b60;
+
   cursor: pointer;
 
-  box-shadow:
-    0 4px 12px rgba(
-      0,
-      0,
-      0,
-      0.1
-    );
+  z-index: 5;
 
-  transition: 0.2s;
+  transition: all 0.25s ease;
 }
 
 
-.card-heart:hover {
-  transform: scale(1.1);
+.heart-btn:hover {
+  background: #fdf2f8;
 
-  background: #fff0f6;
+  transform: scale(1.05);
 }
 
 
 /* =====================================================
-   OFFER INFORMATION
+   OFFER INFO
 ===================================================== */
 
 .offer-info {
-  padding: 18px;
-}
-
-
-.category {
-  color: #999999;
-
-  font-size: 9px;
-
-  font-weight: 800;
-
-  text-transform: uppercase;
-
-  letter-spacing: 1px;
+  padding: 20px;
 }
 
 
 .offer-info h3 {
-  font-size: 18px;
+  margin: 0 0 8px;
 
-  margin: 6px 0;
+  color: #251014;
 
-  color: #111111;
+  font-size: 19px;
+
+  font-weight: 800;
 }
 
 
 .offer-info p {
-  color: #777777;
+  color: #666;
 
-  font-size: 12px;
+  font-size: 14px;
 
   line-height: 1.5;
 
-  height: 36px;
+  min-height: 42px;
 
-  overflow: hidden;
-
-  margin-bottom: 15px;
+  margin: 0;
 }
 
 
 /* =====================================================
-   OFFER FOOTER
+   CARD BOTTOM
 ===================================================== */
 
-.offer-footer {
+.card-bottom {
   display: flex;
+
+  align-items: center;
 
   justify-content: space-between;
 
-  align-items: center;
+  margin-top: 15px;
 }
 
 
-.prices {
-  display: flex;
+.card-bottom .price {
+  margin: 0;
 
-  align-items: center;
+  align-items: flex-start;
 
-  gap: 8px;
-}
+  flex-direction: column;
 
-
-.prices strong {
-  color: #df0874;
-
-  font-size: 20px;
-}
-
-
-.prices del {
-  color: #999999;
-
-  font-size: 13px;
+  gap: 2px;
 }
 
 
 /* =====================================================
-   ADD TO CART
+   SHOPPING BAG
 ===================================================== */
 
 .plus-btn {
-  width: 38px;
-  height: 38px;
+  width: 42px;
 
-  border: 1.5px solid #df0874;
-
-  background: white;
-
-  color: #df0874;
-
-  border-radius: 9px;
+  height: 42px;
 
   display: flex;
 
@@ -1181,209 +946,83 @@ function toggleFavorite(drinkId: number) {
 
   justify-content: center;
 
+  border: 1px solid #d81b60;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e91e63 0%,
+      #d81b60 100%
+    );
+
+  color: white;
+
   cursor: pointer;
 
-  transition: 0.2s;
+  transition: all 0.25s ease;
 }
 
 
 .plus-btn:hover {
-  background: #df0874;
+  transform:
+    translateY(-2px)
+    scale(1.03);
 
-  color: white;
+  box-shadow:
+    0 6px 16px
+    rgba(216, 27, 96, 0.25);
+}
 
-  transform: scale(1.05);
+
+.plus-btn svg {
+  pointer-events: none;
 }
 
 
 /* =====================================================
-   NO OFFERS
+   RESPONSIVE
 ===================================================== */
 
-.no-offers {
-  text-align: center;
-
-  padding: 70px 20px;
-
-  color: #666666;
-}
-
-
-.no-offers h2 {
-  color: #222222;
-
-  margin-bottom: 10px;
-}
-
-
-.no-offers p {
-  margin-bottom: 20px;
-}
-
-
-.no-offers a {
-  display: inline-block;
-
-  background: #df0874;
-
-  color: white;
-
-  padding: 12px 22px;
-
-  border-radius: 10px;
-
-  text-decoration: none;
-
-  font-weight: 700;
-}
-
-
-/* =====================================================
-   TABLET
-===================================================== */
-
-@media (max-width: 850px) {
+@media (max-width: 768px) {
 
   .offers-hero {
-    min-height: 450px;
+    padding: 60px 20px;
   }
 
 
   .offers-hero h1 {
-    font-size: 52px;
-  }
-
-
-  .featured-offer {
-    grid-template-columns: 1fr;
-
-    margin-left: 20px;
-
-    margin-right: 20px;
-  }
-
-
-  .featured-image {
-    height: 330px;
-
-    min-height: 330px;
-  }
-
-
-  .featured-content {
-    padding: 40px;
-  }
-
-
-  .offers-grid {
-    grid-template-columns:
-      repeat(2, 1fr);
-  }
-
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 600px) {
-
-  .offers-hero {
-    min-height: 420px;
-
-    padding: 50px 20px;
-  }
-
-
-  .hero-label {
-    padding: 10px 25px;
-
-    font-size: 11px;
-
-    letter-spacing: 1.5px;
-  }
-
-
-  .offers-hero h1 {
-    font-size: 42px;
-
-    letter-spacing: -1px;
+    font-size: 38px;
   }
 
 
   .offers-hero p {
     font-size: 15px;
-
-    max-width: 400px;
   }
 
 
-  .featured-offer {
-    margin-top: 35px;
-
-    margin-bottom: 50px;
-
-    margin-left: 15px;
-
-    margin-right: 15px;
-
-    border-radius: 18px;
+  .featured-card {
+    grid-template-columns: 1fr;
   }
 
 
   .featured-image {
-    height: 280px;
-
-    min-height: 280px;
+    height: 300px;
   }
 
 
-  .featured-content {
-    padding: 30px 25px;
-  }
-
-
-  .featured-content h2 {
-    font-size: 30px;
-  }
-
-
-  .featured-price strong {
-    font-size: 27px;
-  }
-
-
-  .all-offers {
-    padding-left: 15px;
-
-    padding-right: 15px;
-  }
-
-
-  .section-title {
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 15px;
-  }
-
-
-  .section-title h2 {
-    font-size: 25px;
+  .featured-info {
+    padding: 30px;
   }
 
 
   .offers-grid {
-    grid-template-columns: 1fr;
-
-    gap: 18px;
-  }
-
-
-  .offer-image {
-    height: 280px;
+    grid-template-columns:
+      repeat(
+        auto-fill,
+        minmax(220px, 1fr)
+      );
   }
 
 }
