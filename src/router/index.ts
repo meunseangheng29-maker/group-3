@@ -104,15 +104,15 @@ const router = createRouter({
       component: AdminLoginPage
     },
 
-    {
-      path: '/admin/dashboard',
-      name: 'admin-dashboard',
-      component: AdminOrderPage,
+    // {
+    //   path: '/admin/AdminOrderPage',
+    //   name: 'admin-order',
+    //   component: AdminOrderPage,
 
-      meta: {
-        requiresAdmin: true
-      }
-    },
+    //   meta: {
+    //     requiresAdmin: true
+    //   }
+    // },
 
     {
       path: '/admin/orders',

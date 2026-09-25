@@ -1,284 +1,216 @@
 <template>
   <div class="admin-layout">
-
-    <!-- Sidebar -->
     <AdminSidebar />
 
-    <!-- Main Content -->
     <main class="admin-content">
-
-      <!-- Header -->
       <header class="page-header">
-        <div>
-          <h1>Orders</h1>
-          <p>Manage customer orders.</p>
+        <div class="header-titles">
+          <h1>Orders Pipeline</h1>
+          <p>Real-time order tracking and management board</p>
         </div>
 
-        <div class="admin-user">
-          <User :size="20" />
-          <span>{{ adminUsername }}</span>
+        <div class="header-actions">
+          <button class="action-btn clear-all" @click="clearOrders" v-if="orders.length > 0">
+            <Trash2 :size="16" />
+            Clear All
+          </button>
+          <div class="admin-user-pill">
+            <User :size="16" />
+            <span>{{ adminUsername }}</span>
+          </div>
         </div>
       </header>
 
-
-      <!-- Order Summary -->
-      <div class="stats-grid">
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <ShoppingBag :size="24" />
-          </div>
-
+      <div class="metrics-bar">
+        <div class="metric-item">
+          <ShoppingBag :size="20" class="m-icon" />
           <div>
-            <p>Total Orders</p>
-            <h2>{{ orders.length }}</h2>
+            <span>Total</span>
+            <strong>{{ orders.length }}</strong>
           </div>
         </div>
-
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Clock :size="24" />
-          </div>
-
+        <div class="metric-item">
+          <Clock :size="20" class="m-icon pending" />
           <div>
-            <p>Pending</p>
-            <h2>{{ pendingOrders }}</h2>
+            <span>Pending</span>
+            <strong>{{ pendingOrders }}</strong>
           </div>
         </div>
-
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <CheckCircle :size="24" />
-          </div>
-
+        <div class="metric-item">
+          <CheckCircle :size="20" class="m-icon success" />
           <div>
-            <p>Completed</p>
-            <h2>{{ completedOrders }}</h2>
+            <span>Completed</span>
+            <strong>{{ completedOrders }}</strong>
           </div>
         </div>
-
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <DollarSign :size="24" />
-          </div>
-
+        <div class="metric-item">
+          <DollarSign :size="20" class="m-icon revenue" />
           <div>
-            <p>Total Revenue</p>
-            <h2>${{ totalRevenue.toFixed(2) }}</h2>
+            <span>Revenue</span>
+            <strong>${{ totalRevenue.toFixed(2) }}</strong>
           </div>
         </div>
-
       </div>
 
+      <div v-if="orders.length === 0" class="empty-pipeline">
+        <div class="empty-icon">
+          <ShoppingBag :size="48" />
+        </div>
+        <h3>No active orders</h3>
+        <p>New customer orders will show up here automatically.</p>
+      </div>
 
-      <!-- Orders Card -->
-      <div class="orders-card">
-
-        <div class="card-header">
-          <div>
-            <h2>Customer Orders</h2>
-            <p>View and manage all saved orders.</p>
+      <div v-else class="kanban-pipeline">
+        
+        <div class="kanban-column">
+          <div class="column-header pending-head">
+            <h3>Pending</h3>
+            <span class="count-badge">{{ getOrdersByStatus('pending').length }}</span>
           </div>
-
-          <button
-            class="clear-btn"
-            @click="clearOrders"
-            v-if="orders.length > 0"
-          >
-            <Trash2 :size="17" />
-            Clear All
-          </button>
-        </div>
-
-
-        <!-- Empty -->
-        <div
-          v-if="orders.length === 0"
-          class="empty-state"
-        >
-          <ShoppingBag :size="45" />
-
-          <h3>No Orders Yet</h3>
-
-          <p>
-            Customer orders will appear here.
-          </p>
-        </div>
-
-
-        <!-- Order List -->
-        <div
-          v-else
-          class="orders-list"
-        >
-
-          <div
-            v-for="order in orders"
-            :key="order.id"
-            class="order-card"
-          >
-
-            <!-- Order Header -->
-            <div class="order-header">
-
-              <div>
-                <h3>
-                  Order #{{ order.id }}
-                </h3>
-
-                <p>
-                  {{ order.customerName || 'Customer' }}
-                </p>
+          <div class="column-cards">
+            <div v-for="order in getOrdersByStatus('pending')" :key="order.id" class="kanban-card">
+              <div class="card-top">
+                <span class="id-tag">#{{ order.id }}</span>
+                <button class="delete-mini" @click="deleteOrder(order.id)">
+                  <Trash2 :size="14" />
+                </button>
               </div>
-
-              <span
-                class="status"
-                :class="getStatusClass(order.status)"
-              >
-                {{ order.status || 'Pending' }}
-              </span>
-
-            </div>
-
-
-            <!-- Customer Information -->
-            <div class="customer-info">
-
-              <div>
-                <strong>Phone</strong>
-                <span>
-                  {{ order.phone || 'N/A' }}
-                </span>
+              <div class="customer-details">
+                <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
+                <p>📞 {{ order.phone || 'N/A' }}</p>
+                <p>📍 {{ order.address || 'N/A' }}</p>
               </div>
-
-              <div>
-                <strong>Address</strong>
-                <span>
-                  {{ order.address || 'N/A' }}
-                </span>
-              </div>
-
-            </div>
-
-
-            <!-- Items -->
-            <div class="order-items">
-
-              <h4>Order Items</h4>
-
-              <div
-                v-for="(item, index) in order.items"
-                :key="index"
-                class="order-item"
-              >
-
-                <div>
-                  <strong>
-                    {{ item.name }}
-                  </strong>
-
-                  <span>
-                    Qty: {{ item.quantity || item.qty || 1 }}
-                  </span>
+              <div class="items-summary">
+                <div v-for="(item, idx) in order.items" :key="idx" class="item-row">
+                  <span>{{ item.name }} (x{{ item.quantity || item.qty || 1 }})</span>
                 </div>
-
-                <strong>
-                  ${{
-                    (
-                      Number(item.price || 0) *
-                      Number(item.quantity || item.qty || 1)
-                    ).toFixed(2)
-                  }}
-                </strong>
-
               </div>
-
+              <div class="card-bottom">
+                <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
+                <button class="advance-btn" @click="changeStatus(order)">
+                  Next ➔
+                </button>
+              </div>
             </div>
-
-
-            <!-- Order Footer -->
-            <div class="order-footer">
-
-              <span>
-                Total
-              </span>
-
-              <strong>
-                ${{ getOrderTotal(order).toFixed(2) }}
-              </strong>
-
-            </div>
-
-
-            <!-- Actions -->
-            <div class="order-actions">
-
-              <button
-                class="status-btn"
-                @click="changeStatus(order)"
-              >
-                <RefreshCw :size="16" />
-                Change Status
-              </button>
-
-              <button
-                class="delete-btn"
-                @click="deleteOrder(order.id)"
-              >
-                <Trash2 :size="16" />
-                Delete
-              </button>
-
-            </div>
-
           </div>
+        </div>
 
+        <div class="kanban-column">
+          <div class="column-header preparing-head">
+            <h3>Preparing</h3>
+            <span class="count-badge">{{ getOrdersByStatus('preparing').length }}</span>
+          </div>
+          <div class="column-cards">
+            <div v-for="order in getOrdersByStatus('preparing')" :key="order.id" class="kanban-card">
+              <div class="card-top">
+                <span class="id-tag">#{{ order.id }}</span>
+                <button class="delete-mini" @click="deleteOrder(order.id)">
+                  <Trash2 :size="14" />
+                </button>
+              </div>
+              <div class="customer-details">
+                <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
+                <p>📞 {{ order.phone || 'N/A' }}</p>
+                <p>📍 {{ order.address || 'N/A' }}</p>
+              </div>
+              <div class="items-summary">
+                <div v-for="(item, idx) in order.items" :key="idx" class="item-row">
+                  <span>{{ item.name }} (x{{ item.quantity || item.qty || 1 }})</span>
+                </div>
+              </div>
+              <div class="card-bottom">
+                <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
+                <button class="advance-btn" @click="changeStatus(order)">
+                  Next ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <div class="column-header ready-head">
+            <h3>Ready</h3>
+            <span class="count-badge">{{ getOrdersByStatus('ready').length }}</span>
+          </div>
+          <div class="column-cards">
+            <div v-for="order in getOrdersByStatus('ready')" :key="order.id" class="kanban-card">
+              <div class="card-top">
+                <span class="id-tag">#{{ order.id }}</span>
+                <button class="delete-mini" @click="deleteOrder(order.id)">
+                  <Trash2 :size="14" />
+                </button>
+              </div>
+              <div class="customer-details">
+                <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
+                <p>📞 {{ order.phone || 'N/A' }}</p>
+                <p>📍 {{ order.address || 'N/A' }}</p>
+              </div>
+              <div class="items-summary">
+                <div v-for="(item, idx) in order.items" :key="idx" class="item-row">
+                  <span>{{ item.name }} (x{{ item.quantity || item.qty || 1 }})</span>
+                </div>
+              </div>
+              <div class="card-bottom">
+                <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
+                <button class="advance-btn" @click="changeStatus(order)">
+                  Next ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <div class="column-header completed-head">
+            <h3>Delivered</h3>
+            <span class="count-badge">{{ (getOrdersByStatus('delivered').length + getOrdersByStatus('completed').length) }}</span>
+          </div>
+          <div class="column-cards">
+            <template v-for="order in [...getOrdersByStatus('delivered'), ...getOrdersByStatus('completed')]" :key="order.id">
+              <div class="kanban-card done">
+                <div class="card-top">
+                  <span class="id-tag">#{{ order.id }}</span>
+                  <button class="delete-mini" @click="deleteOrder(order.id)">
+                    <Trash2 :size="14" />
+                  </button>
+                </div>
+                <div class="customer-details">
+                  <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
+                  <p>📞 {{ order.phone || 'N/A' }}</p>
+                </div>
+                <div class="card-bottom">
+                  <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
+                  <span class="done-tag">Done ✓</span>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
 
       </div>
-
     </main>
-
   </div>
 </template>
 
-
 <script setup lang="ts">
-
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
 import AdminSidebar from '../components/AdminSidebar.vue'
-
 import {
   User,
   ShoppingBag,
   Clock,
   CheckCircle,
   DollarSign,
-  Trash2,
-  RefreshCw
+  Trash2
 } from 'lucide-vue-next'
 
-
 const router = useRouter()
-
-
-// =========================
-// ADMIN USER
-// =========================
 
 const adminUsername = ref(
   localStorage.getItem('adminUsername') || 'Admin'
 )
-
-
-// =========================
-// TYPES
-// =========================
 
 interface OrderItem {
   name: string
@@ -286,7 +218,6 @@ interface OrderItem {
   quantity?: number
   qty?: number
 }
-
 
 interface Order {
   id: string | number
@@ -299,848 +230,393 @@ interface Order {
   items: OrderItem[]
 }
 
-
-// =========================
-// LOAD ORDERS
-// =========================
-
 const orders = ref<Order[]>([])
 
-
 function loadOrders() {
-
-  const savedOrders =
-    localStorage.getItem('adminOrders')
-
+  const savedOrders = localStorage.getItem('adminOrders')
   if (!savedOrders) {
     orders.value = []
     return
   }
-
   try {
-
     const data = JSON.parse(savedOrders)
-
-    if (Array.isArray(data)) {
-      orders.value = data
-    } else {
-      orders.value = []
-    }
-
+    orders.value = Array.isArray(data) ? data : []
   } catch (error) {
-
-    console.error(
-      'Error loading orders:',
-      error
-    )
-
+    console.error('Error loading orders:', error)
     orders.value = []
-
   }
-
 }
-
 
 loadOrders()
 
-
-// =========================
-// CALCULATE ORDER TOTAL
-// =========================
-
 function getOrderTotal(order: Order) {
-
-  if (
-    order.total !== undefined &&
-    !isNaN(Number(order.total))
-  ) {
+  if (order.total !== undefined && !isNaN(Number(order.total))) {
     return Number(order.total)
   }
-
-  return order.items.reduce(
-    (total, item) => {
-
-      const quantity =
-        Number(
-          item.quantity ??
-          item.qty ??
-          1
-        )
-
-      const price =
-        Number(item.price || 0)
-
-      return total + price * quantity
-
-    },
-    0
-  )
-
+  return order.items.reduce((total, item) => {
+    const quantity = Number(item.quantity ?? item.qty ?? 1)
+    const price = Number(item.price || 0)
+    return total + price * quantity
+  }, 0)
 }
 
-
-// =========================
-// STATISTICS
-// =========================
+function getOrdersByStatus(statusKey: string) {
+  return orders.value.filter(order => {
+    const s = (order.status || 'Pending').toLowerCase()
+    if (statusKey === 'completed' || statusKey === 'delivered') {
+      return s === 'completed' || s === 'delivered'
+    }
+    return s === statusKey
+  })
+}
 
 const pendingOrders = computed(() => {
-
   return orders.value.filter(
-    order =>
-      (order.status || 'Pending')
-        .toLowerCase() === 'pending'
+    order => (order.status || 'Pending').toLowerCase() === 'pending'
   ).length
-
 })
-
 
 const completedOrders = computed(() => {
-
   return orders.value.filter(
-    order =>
-      ['completed', 'delivered']
-        .includes(
-          (order.status || '')
-            .toLowerCase()
-        )
+    order => ['completed', 'delivered'].includes((order.status || '').toLowerCase())
   ).length
-
 })
-
 
 const totalRevenue = computed(() => {
-
-  return orders.value.reduce(
-    (total, order) => {
-
-      return total +
-        getOrderTotal(order)
-
-    },
-    0
-  )
-
+  return orders.value.reduce((total, order) => total + getOrderTotal(order), 0)
 })
 
-
-// =========================
-// CHANGE STATUS
-// =========================
-
 function changeStatus(order: Order) {
+  const statuses = ['Pending', 'Preparing', 'Ready', 'Delivered']
+  const current = (order.status || 'Pending').toLowerCase()
+  let next = 'Pending'
+  
+  if (current === 'pending') next = 'Preparing'
+  else if (current === 'preparing') next = 'Ready'
+  else if (current === 'ready') next = 'Delivered'
+  else next = 'Pending'
 
-  const statuses = [
-    'Pending',
-    'Preparing',
-    'Ready',
-    'Delivered',
-    'Cancelled'
-  ]
-
-  const currentIndex =
-    statuses.indexOf(
-      order.status || 'Pending'
-    )
-
-  const nextIndex =
-    (currentIndex + 1) %
-    statuses.length
-
-  order.status =
-    statuses[nextIndex]
-
+  order.status = next
   saveOrders()
-
 }
-
-
-// =========================
-// SAVE ORDERS
-// =========================
 
 function saveOrders() {
-
-  localStorage.setItem(
-    'adminOrders',
-    JSON.stringify(orders.value)
-  )
-
+  localStorage.setItem('adminOrders', JSON.stringify(orders.value))
 }
 
-
-// =========================
-// DELETE ONE ORDER
-// =========================
-
-function deleteOrder(
-  id: string | number
-) {
-
-  const confirmed = confirm(
-    'Are you sure you want to delete this order?'
-  )
-
-  if (!confirmed) return
-
-  orders.value =
-    orders.value.filter(
-      order => order.id !== id
-    )
-
+function deleteOrder(id: string | number) {
+  if (!confirm('Are you sure you want to delete this order?')) return
+  orders.value = orders.value.filter(order => order.id !== id)
   saveOrders()
-
 }
-
-
-// =========================
-// CLEAR ALL ORDERS
-// =========================
 
 function clearOrders() {
-
-  const confirmed = confirm(
-    'Are you sure you want to delete all orders?'
-  )
-
-  if (!confirmed) return
-
-  localStorage.removeItem(
-    'adminOrders'
-  )
-
+  if (!confirm('Are you sure you want to delete all orders?')) return
+  localStorage.removeItem('adminOrders')
   orders.value = []
-
 }
-
-
-// =========================
-// STATUS CLASS
-// =========================
-
-function getStatusClass(
-  status?: string
-) {
-
-  const value =
-    (status || 'Pending')
-      .toLowerCase()
-
-  if (value === 'completed') {
-    return 'completed'
-  }
-
-  if (value === 'delivered') {
-    return 'delivered'
-  }
-
-  if (value === 'preparing') {
-    return 'preparing'
-  }
-
-  if (value === 'ready') {
-    return 'ready'
-  }
-
-  if (value === 'cancelled') {
-    return 'cancelled'
-  }
-
-  return 'pending'
-
-}
-
 </script>
 
-
 <style scoped>
-
-/* =========================
-   ADMIN LAYOUT
-========================= */
-
 .admin-layout {
   min-height: 100vh;
-  background: #fff8fa;
+  background: #f4f7fe;
+  font-family: 'Inter', sans-serif;
 }
-
-
-/* =========================
-   MAIN CONTENT
-========================= */
 
 .admin-content {
-  margin-left: 250px;
+  margin-left: 260px;
   padding: 30px;
 }
-
-
-/* =========================
-   HEADER
-========================= */
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
-.page-header h1 {
-  margin: 0 0 8px;
-
-  color: #d81b60;
-
-  font-size: 30px;
+.header-titles h1 {
+  margin: 0 0 2px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b2559;
 }
 
-.page-header p {
+.header-titles p {
   margin: 0;
-
-  color: #777;
+  color: #707eae;
+  font-size: 13px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-/* =========================
-   ADMIN USER
-========================= */
-
-.admin-user {
+.admin-user-pill {
   display: flex;
   align-items: center;
   gap: 8px;
-
-  padding: 10px 16px;
-
   background: white;
-
-  border-radius: 12px;
-
-  color: #555;
-
-  box-shadow:
-    0 4px 15px
-    rgba(0, 0, 0, 0.05);
+  padding: 6px 14px 6px 10px;
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  font-weight: 600;
+  color: #2b3674;
+  font-size: 13px;
 }
 
-
-/* =========================
-   STATISTICS
-========================= */
-
-.stats-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
-
-  gap: 20px;
-
-  margin-bottom: 30px;
-}
-
-
-.stat-card {
+.action-btn.clear-all {
   display: flex;
-
   align-items: center;
-
-  gap: 15px;
-
-  background: white;
-
-  padding: 22px;
-
-  border-radius: 16px;
-
-  box-shadow:
-    0 5px 20px
-    rgba(0, 0, 0, 0.05);
+  gap: 6px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
 }
 
+/* Metrics Mini Bar */
+.metrics-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 24px;
+}
 
-.stat-icon {
+.metric-item {
+  background: white;
+  padding: 14px 18px;
+  border-radius: 14px;
   display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
 
+.m-icon {
+  color: #3b82f6;
+}
+.m-icon.pending { color: #d97706; }
+.m-icon.success { color: #16a34a; }
+.m-icon.revenue { color: #dc2626; }
+
+.metric-item span {
+  display: block;
+  font-size: 11px;
+  color: #707eae;
+  font-weight: 500;
+}
+
+.metric-item strong {
+  font-size: 16px;
+  color: #1b2559;
+}
+
+/* Kanban Pipeline Layout */
+.kanban-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: start;
+  overflow-x: auto;
+  padding-bottom: 20px;
+}
+
+.kanban-column {
+  background: #ebf0fa;
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 450px;
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pending-head { background: #fef3c7; color: #b45309; }
+.preparing-head { background: #ffedd5; color: #c2410c; }
+.ready-head { background: #e0f2fe; color: #0369a1; }
+.completed-head { background: #dcfce7; color: #15803d; }
+
+.column-header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.count-badge {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+}
+
+.column-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kanban-card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.kanban-card.done {
+  background: #f8fafc;
+  opacity: 0.85;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.id-tag {
+  background: #1b2559;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.delete-mini {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.delete-mini:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.customer-details h4 {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1b2559;
+}
+
+.customer-details p {
+  margin: 0;
+  font-size: 11px;
+  color: #707eae;
+}
+
+.items-summary {
+  background: #f8fafc;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: #334155;
+}
+
+.item-row {
+  margin-bottom: 2px;
+}
+.item-row:last-child {
+  margin-bottom: 0;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed #f1f5f9;
+  padding-top: 8px;
+}
+
+.price-val {
+  font-weight: 700;
+  font-size: 14px;
+  color: #ff3366;
+}
+
+.advance-btn {
+  background: #f1f5f9;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1b2559;
+  cursor: pointer;
+}
+
+.advance-btn:hover {
+  background: #1b2559;
+  color: white;
+}
+
+.done-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.empty-pipeline {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  color: #707eae;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 48px;
-  height: 48px;
-
-  border-radius: 12px;
-
-  background: #fde3ed;
-
-  color: #d81b60;
+  margin: 0 auto 12px;
+  color: #cbd5e1;
 }
 
-
-.stat-card p {
-  margin: 0 0 5px;
-
-  color: #888;
-
-  font-size: 14px;
-}
-
-
-.stat-card h2 {
-  margin: 0;
-
-  color: #333;
-
-  font-size: 24px;
-}
-
-
-/* =========================
-   ORDERS CARD
-========================= */
-
-.orders-card {
-  background: white;
-
-  border-radius: 18px;
-
-  padding: 25px;
-
-  box-shadow:
-    0 5px 20px
-    rgba(0, 0, 0, 0.05);
-}
-
-
-/* =========================
-   CARD HEADER
-========================= */
-
-.card-header {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  margin-bottom: 25px;
-}
-
-
-.card-header h2 {
-  margin: 0 0 5px;
-
-  color: #333;
-}
-
-
-.card-header p {
-  margin: 0;
-
-  color: #888;
-
-  font-size: 14px;
-}
-
-
-/* =========================
-   CLEAR BUTTON
-========================= */
-
-.clear-btn {
-  display: flex;
-
-  align-items: center;
-
-  gap: 7px;
-
-  border: none;
-
-  padding: 10px 16px;
-
-  border-radius: 10px;
-
-  background: #e74c3c;
-
-  color: white;
-
-  font-weight: bold;
-
-  cursor: pointer;
-}
-
-
-.clear-btn:hover {
-  opacity: 0.85;
-}
-
-
-/* =========================
-   EMPTY STATE
-========================= */
-
-.empty-state {
-  text-align: center;
-
-  padding: 70px 20px;
-
-  color: #aaa;
-}
-
-
-.empty-state h3 {
-  margin: 15px 0 8px;
-
-  color: #555;
-}
-
-
-.empty-state p {
-  margin: 0;
-}
-
-
-/* =========================
-   ORDERS LIST
-========================= */
-
-.orders-list {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 20px;
-}
-
-
-/* =========================
-   ORDER CARD
-========================= */
-
-.order-card {
-  border: 1px solid #f2dfe7;
-
-  border-radius: 15px;
-
-  padding: 20px;
-
-  background: #fff;
-}
-
-
-/* =========================
-   ORDER HEADER
-========================= */
-
-.order-header {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  padding-bottom: 15px;
-
-  border-bottom:
-    1px solid #f2dfe7;
-}
-
-
-.order-header h3 {
-  margin: 0 0 5px;
-
-  color: #333;
-}
-
-
-.order-header p {
-  margin: 0;
-
-  color: #888;
-}
-
-
-/* =========================
-   STATUS
-========================= */
-
-.status {
-  padding: 7px 13px;
-
-  border-radius: 20px;
-
-  font-size: 13px;
-
-  font-weight: bold;
-}
-
-
-.status.pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-
-.status.preparing {
-  background: #e8ddff;
-  color: #6842a5;
-}
-
-
-.status.ready {
-  background: #d9edf7;
-  color: #31708f;
-}
-
-
-.status.delivered,
-.status.completed {
-  background: #dff5e5;
-  color: #27843b;
-}
-
-
-.status.cancelled {
-  background: #fde0e0;
-  color: #c0392b;
-}
-
-
-/* =========================
-   CUSTOMER INFO
-========================= */
-
-.customer-info {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 20px;
-
-  padding: 18px 0;
-}
-
-
-.customer-info div {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 5px;
-}
-
-
-.customer-info strong {
-  color: #555;
-
-  font-size: 13px;
-}
-
-
-.customer-info span {
-  color: #777;
-
-  font-size: 14px;
-}
-
-
-/* =========================
-   ORDER ITEMS
-========================= */
-
-.order-items {
-  padding: 15px 0;
-
-  border-top:
-    1px solid #f2dfe7;
-}
-
-
-.order-items h4 {
-  margin: 0 0 12px;
-
-  color: #555;
-}
-
-
-.order-item {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  padding: 10px 0;
-}
-
-
-.order-item div {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 4px;
-}
-
-
-.order-item strong {
-  color: #333;
-}
-
-
-.order-item span {
-  color: #999;
-
-  font-size: 13px;
-}
-
-
-/* =========================
-   ORDER FOOTER
-========================= */
-
-.order-footer {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  padding-top: 15px;
-
-  border-top:
-    1px solid #f2dfe7;
-}
-
-
-.order-footer span {
-  color: #777;
-
-  font-weight: bold;
-}
-
-
-.order-footer strong {
-  color: #d81b60;
-
-  font-size: 20px;
-}
-
-
-/* =========================
-   ACTIONS
-========================= */
-
-.order-actions {
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 10px;
-
-  margin-top: 15px;
-}
-
-
-.status-btn,
-.delete-btn {
-  display: flex;
-
-  align-items: center;
-
-  gap: 6px;
-
-  border: none;
-
-  padding: 9px 14px;
-
-  border-radius: 9px;
-
-  color: white;
-
-  font-weight: bold;
-
-  cursor: pointer;
-}
-
-
-.status-btn {
-  background: #d81b60;
-}
-
-
-.delete-btn {
-  background: #e74c3c;
-}
-
-
-.status-btn:hover,
-.delete-btn:hover {
-  opacity: 0.85;
-}
-
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 1000px) {
-
-  .stats-grid {
-    grid-template-columns:
-      repeat(2, 1fr);
+@media (max-width: 1200px) {
+  .kanban-pipeline {
+    grid-template-columns: repeat(2, 1fr);
   }
-
 }
-
 
 @media (max-width: 768px) {
-
   .admin-content {
     margin-left: 70px;
-
-    padding: 20px;
+    padding: 15px;
   }
-
-
-  .page-header {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 15px;
+  .metrics-bar {
+    grid-template-columns: 1fr 1fr;
   }
-
-
-  .stats-grid {
+  .kanban-pipeline {
     grid-template-columns: 1fr;
   }
-
-
-  .customer-info {
-    grid-template-columns: 1fr;
-  }
-
-
-  .card-header {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 15px;
-  }
-
-
-  .order-actions {
-    flex-direction: column;
-  }
-
-
-  .status-btn,
-  .delete-btn {
-    justify-content: center;
-  }
-
 }
-
 </style>
