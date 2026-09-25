@@ -72,10 +72,7 @@ function openSearch() {
         Contact
       </RouterLink>
 
-      <RouterLink to="/admin/orders">
-        <Toolbox :size="20" />
-        Admin Dashboard
-      </RouterLink>
+      
 
     </div>
 
@@ -165,10 +162,10 @@ function openSearch() {
         Contact
       </RouterLink>
 
-      <RouterLink to="/admin/orders" @click="closeMenu">
+      <!--<RouterLink to="/admin/orders" @click="closeMenu">
         <Toolbox :size="20" />
-        Admin Dashboard
-      </RouterLink>
+        Customer order
+      </RouterLink>-->
 
     </div>
 

@@ -1,4 +1,3 @@
-
 import {
   createRouter,
   createWebHistory
@@ -15,122 +14,205 @@ import LoginPage from '../pages/LoginPage.vue'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage.vue'
 import RegisterPage from '../pages/RegisterPage.vue'
 import SearchPage from '../pages/SearchPage.vue'
+
+import AdminLoginPage from '../pages/AdminLoginPage.vue'
 import AdminOrderPage from '../pages/AdminOrderPage.vue'
-import { useAuth } from "../stores/auth";
+import AdminDrinksPage from '../pages/AdminDrinksPage.vue'
+import AdminCustomersPage from '../pages/AdminCustomersPage.vue'
+import AdminAnalyticsPage from '../pages/AdminAnalyticsPage.vue'
+import AdminSettingsPage from '../pages/AdminSettingsPage.vue'
+import AdminDashboard from '../pages/AdminDashboard.vue'
+
+import { useAuth } from '../stores/auth'
+
 
 const router = createRouter({
+
   history: createWebHistory(),
 
   routes: [
-    // Home
+
+      {
+        path: '/admin/dashboard',
+        name: 'admin-dashboard',
+        component: AdminDashboard
+      },
+
     {
       path: '/',
       name: 'home',
       component: HomePage
     },
-
-    // About
     {
       path: '/about',
       name: 'about',
       component: AboutPage
     },
-
-    // Drinks
     {
       path: '/drinks',
       name: 'drinks',
       component: DrinkPage
     },
-
-    // Offers
     {
       path: '/offers',
       name: 'offers',
       component: OffersPage
     },
-
-    // Contact
     {
       path: '/contact',
       name: 'contact',
       component: ContactPage
     },
-
-    // Cart
     {
       path: '/cart',
       name: 'cart',
       component: CartPage
     },
-
-    // Login
     {
       path: '/login',
       name: 'login',
       component: LoginPage
     },
-
-    // Foget Password
     {
       path: '/forgot-password',
       name: 'forgot-password',
       component: ForgotPasswordPage
     },
-
-    // Register 
     {
       path: '/register',
       name: 'register',
       component: RegisterPage
     },
-
-    // Search
     {
       path: '/search',
       name: 'search',
       component: SearchPage
     },
-
-    // Checkout
     {
       path: '/checkout',
       name: 'checkout',
       component: CheckoutPage,
+
       meta: {
         requiresAuth: true
       }
     },
+
     {
-    path: '/admin/orders',
-    name: 'AdminOrders',
-    component: AdminOrderPage // ឬផ្លូវរៀងខ្លួនតាម folder របស់អ្នក
+      path: '/admin',
+      name: 'admin-login',
+      component: AdminLoginPage
+    },
+
+    {
+      path: '/admin/dashboard',
+      name: 'admin-dashboard',
+      component: AdminOrderPage,
+
+      meta: {
+        requiresAdmin: true
+      }
+    },
+
+    {
+      path: '/admin/orders',
+      name: 'admin-orders',
+      component: AdminOrderPage,
+
+      meta: {
+        requiresAdmin: true
+      }
+    },
+
+    {
+      path: '/admin/drinks',
+      name: 'admin-drinks',
+      component: AdminDrinksPage,
+
+      meta: {
+        requiresAdmin: true
+      }
+    },
+
+    {
+      path: '/admin/customers',
+      name: 'admin-customers',
+      component: AdminCustomersPage,
+
+      meta: {
+        requiresAdmin: true
+      }
+    },
+
+    {
+      path: '/admin/analytics',
+      name: 'admin-analytics',
+      component: AdminAnalyticsPage,
+
+      meta: {
+        requiresAdmin: true
+      }
+    },
+
+    {
+      path: '/admin/settings',
+      name: 'admin-settings',
+      component: AdminSettingsPage,
+
+      meta: {
+        requiresAdmin: true
+      }
     }
-    ],
+
+  ],
 
   scrollBehavior() {
     return {
       top: 0
     }
   }
+
 })
 
-// Protect routes that require login
+
 router.beforeEach((to) => {
-  const auth = useAuth();
+
+  const auth = useAuth()
+
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
+
     return {
-      name: "login",
+      name: 'login',
 
       query: {
-        redirect: to.fullPath,
-      },
-    };
+        redirect: to.fullPath
+      }
+    }
+
   }
 
-  return true;
-});
+
+  if (to.meta.requiresAdmin) {
+
+    const adminLoggedIn =
+      localStorage.getItem('adminLoggedIn') === 'true'
+
+
+    if (!adminLoggedIn) {
+
+      return {
+        name: 'admin-login'
+      }
+
+    }
+
+  }
+
+
+  return true
+
+})
+
 
 export default router
-
