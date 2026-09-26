@@ -116,7 +116,7 @@ const orderNow = () => {
 
         <p class="hero-description">
           Try our special drink today.<br>
-          Fresh, tasty and made with love! 💛
+          Fresh, tasty and made with love! 
         </p>
 
         <!-- PRICE -->

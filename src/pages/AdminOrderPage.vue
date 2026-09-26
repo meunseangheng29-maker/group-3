@@ -62,6 +62,7 @@
 
       <div v-else class="kanban-pipeline">
         
+        <!-- Pending Column -->
         <div class="kanban-column">
           <div class="column-header pending-head">
             <h3>Pending</h3>
@@ -77,8 +78,14 @@
               </div>
               <div class="customer-details">
                 <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
-                <p>📞 {{ order.phone || 'N/A' }}</p>
-                <p>📍 {{ order.address || 'N/A' }}</p>
+                <p>
+                  <Phone :size="12" class="inline-icon" />
+                  {{ order.phone || 'N/A' }}
+                </p>
+                <p>
+                  <MapPin :size="12" class="inline-icon" />
+                  {{ order.address || 'N/A' }}
+                </p>
               </div>
               <div class="items-summary">
                 <div v-for="(item, idx) in order.items" :key="idx" class="item-row">
@@ -87,14 +94,21 @@
               </div>
               <div class="card-bottom">
                 <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
-                <button class="advance-btn" @click="changeStatus(order)">
-                  Next ➔
-                </button>
+                <div class="card-action-buttons">
+                  <button class="receipt-btn" @click="openReceipt(order)" title="View Receipt">
+                    <FileText :size="14" />
+                  </button>
+                  <button class="advance-btn" @click="changeStatus(order)">
+                    <span>Next</span>
+                    <ArrowRight :size="14" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Preparing Column -->
         <div class="kanban-column">
           <div class="column-header preparing-head">
             <h3>Preparing</h3>
@@ -110,8 +124,14 @@
               </div>
               <div class="customer-details">
                 <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
-                <p>📞 {{ order.phone || 'N/A' }}</p>
-                <p>📍 {{ order.address || 'N/A' }}</p>
+                <p>
+                  <Phone :size="12" class="inline-icon" />
+                  {{ order.phone || 'N/A' }}
+                </p>
+                <p>
+                  <MapPin :size="12" class="inline-icon" />
+                  {{ order.address || 'N/A' }}
+                </p>
               </div>
               <div class="items-summary">
                 <div v-for="(item, idx) in order.items" :key="idx" class="item-row">
@@ -120,14 +140,21 @@
               </div>
               <div class="card-bottom">
                 <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
-                <button class="advance-btn" @click="changeStatus(order)">
-                  Next ➔
-                </button>
+                <div class="card-action-buttons">
+                  <button class="receipt-btn" @click="openReceipt(order)" title="View Receipt">
+                    <FileText :size="14" />
+                  </button>
+                  <button class="advance-btn" @click="changeStatus(order)">
+                    <span>Next</span>
+                    <ArrowRight :size="14" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Ready Column -->
         <div class="kanban-column">
           <div class="column-header ready-head">
             <h3>Ready</h3>
@@ -143,8 +170,14 @@
               </div>
               <div class="customer-details">
                 <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
-                <p>📞 {{ order.phone || 'N/A' }}</p>
-                <p>📍 {{ order.address || 'N/A' }}</p>
+                <p>
+                  <Phone :size="12" class="inline-icon" />
+                  {{ order.phone || 'N/A' }}
+                </p>
+                <p>
+                  <MapPin :size="12" class="inline-icon" />
+                  {{ order.address || 'N/A' }}
+                </p>
               </div>
               <div class="items-summary">
                 <div v-for="(item, idx) in order.items" :key="idx" class="item-row">
@@ -153,21 +186,28 @@
               </div>
               <div class="card-bottom">
                 <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
-                <button class="advance-btn" @click="changeStatus(order)">
-                  Next ➔
-                </button>
+                <div class="card-action-buttons">
+                  <button class="receipt-btn" @click="openReceipt(order)" title="View Receipt">
+                    <FileText :size="14" />
+                  </button>
+                  <button class="advance-btn" @click="changeStatus(order)">
+                    <span>Next</span>
+                    <ArrowRight :size="14" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Delivered / Completed Column -->
         <div class="kanban-column">
           <div class="column-header completed-head">
             <h3>Delivered</h3>
-            <span class="count-badge">{{ (getOrdersByStatus('delivered').length + getOrdersByStatus('completed').length) }}</span>
+            <span class="count-badge">{{ getOrdersByStatus('delivered').length }}</span>
           </div>
           <div class="column-cards">
-            <template v-for="order in [...getOrdersByStatus('delivered'), ...getOrdersByStatus('completed')]" :key="order.id">
+            <template v-for="order in getOrdersByStatus('delivered')" :key="order.id">
               <div class="kanban-card done">
                 <div class="card-top">
                   <span class="id-tag">#{{ order.id }}</span>
@@ -177,11 +217,22 @@
                 </div>
                 <div class="customer-details">
                   <h4>{{ order.customerName || order.name || 'Customer' }}</h4>
-                  <p>📞 {{ order.phone || 'N/A' }}</p>
+                  <p>
+                    <Phone :size="12" class="inline-icon" />
+                    {{ order.phone || 'N/A' }}
+                  </p>
                 </div>
                 <div class="card-bottom">
                   <span class="price-val">${{ getOrderTotal(order).toFixed(2) }}</span>
-                  <span class="done-tag">Done ✓</span>
+                  <div class="card-action-buttons">
+                    <button class="receipt-btn" @click="openReceipt(order)" title="View Receipt">
+                      <FileText :size="14" />
+                    </button>
+                    <span class="done-tag">
+                      <Check :size="12" class="inline-icon" />
+                      Done
+                    </span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -190,6 +241,62 @@
 
       </div>
     </main>
+
+    <!-- Refined Receipt Modal Form with Lucide Icon -->
+    <div v-if="showReceiptModal" class="modal-overlay" @click.self="closeReceipt">
+      <div class="receipt-modal">
+        <div class="receipt-header">
+          <div class="receipt-logo-icon">
+            <ReceiptText :size="28" />
+          </div>
+          <h3>Drink of the Day</h3>
+          <p class="receipt-subtitle">Official Receipt</p>
+        </div>
+        
+        <div v-if="selectedOrder" class="receipt-body">
+          <div class="receipt-meta-box">
+            <div class="receipt-info-row">
+              <span>Order ID:</span>
+              <strong>#{{ selectedOrder.id }}</strong>
+            </div>
+            <div class="receipt-info-row">
+              <span>Customer:</span>
+              <strong>{{ selectedOrder.customerName || selectedOrder.name || 'Guest' }}</strong>
+            </div>
+            <div class="receipt-info-row">
+              <span>Phone:</span>
+              <strong>{{ selectedOrder.phone || 'N/A' }}</strong>
+            </div>
+            <div class="receipt-info-row">
+              <span>Date:</span>
+              <strong>{{ new Date().toLocaleString() }}</strong>
+            </div>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-items-table">
+            <div v-for="(item, idx) in selectedOrder.items" :key="idx" class="receipt-item-row">
+              <span class="item-name">{{ item.name }} <small>x{{ item.quantity || item.qty || 1 }}</small></span>
+              <span class="item-price">${{ (Number(item.price || 0) * Number(item.quantity || item.qty || 1)).toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-total-row">
+            <span>TOTAL AMOUNT</span>
+            <span class="total-price">${{ getOrderTotal(selectedOrder).toFixed(2) }}</span>
+          </div>
+
+          <div class="receipt-footer-msg">
+            <p>Thank you for your order!</p>
+          </div>
+        </div>
+
+        <button class="close-modal-btn" @click="closeReceipt">Close Receipt</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -203,7 +310,13 @@ import {
   Clock,
   CheckCircle,
   DollarSign,
-  Trash2
+  Trash2,
+  Phone,
+  MapPin,
+  ArrowRight,
+  Check,
+  FileText,
+  ReceiptText
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -231,6 +344,8 @@ interface Order {
 }
 
 const orders = ref<Order[]>([])
+const showReceiptModal = ref(false)
+const selectedOrder = ref<Order | null>(null)
 
 function loadOrders() {
   const savedOrders = localStorage.getItem('adminOrders')
@@ -263,10 +378,10 @@ function getOrderTotal(order: Order) {
 function getOrdersByStatus(statusKey: string) {
   return orders.value.filter(order => {
     const s = (order.status || 'Pending').toLowerCase()
-    if (statusKey === 'completed' || statusKey === 'delivered') {
-      return s === 'completed' || s === 'delivered'
+    if (statusKey.toLowerCase() === 'delivered' || statusKey.toLowerCase() === 'completed') {
+      return s === 'delivered' || s === 'completed'
     }
-    return s === statusKey
+    return s === statusKey.toLowerCase()
   })
 }
 
@@ -287,7 +402,6 @@ const totalRevenue = computed(() => {
 })
 
 function changeStatus(order: Order) {
-  const statuses = ['Pending', 'Preparing', 'Ready', 'Delivered']
   const current = (order.status || 'Pending').toLowerCase()
   let next = 'Pending'
   
@@ -298,6 +412,16 @@ function changeStatus(order: Order) {
 
   order.status = next
   saveOrders()
+}
+
+function openReceipt(order: Order) {
+  selectedOrder.value = order
+  showReceiptModal.value = true
+}
+
+function closeReceipt() {
+  showReceiptModal.value = false
+  selectedOrder.value = null
 }
 
 function saveOrders() {
@@ -525,9 +649,16 @@ function clearOrders() {
 }
 
 .customer-details p {
-  margin: 0;
+  margin: 2px 0;
   font-size: 11px;
   color: #707eae;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inline-icon {
+  vertical-align: middle;
 }
 
 .items-summary {
@@ -553,10 +684,35 @@ function clearOrders() {
   padding-top: 8px;
 }
 
+.card-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .price-val {
   font-weight: 700;
   font-size: 14px;
   color: #ff3366;
+}
+
+.receipt-btn {
+  background: #e0f2fe;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0369a1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receipt-btn:hover {
+  background: #0284c7;
+  color: white;
 }
 
 .advance-btn {
@@ -568,6 +724,9 @@ function clearOrders() {
   font-weight: 600;
   color: #1b2559;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .advance-btn:hover {
@@ -579,6 +738,9 @@ function clearOrders() {
   font-size: 11px;
   font-weight: 700;
   color: #15803d;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .empty-pipeline {
@@ -599,6 +761,173 @@ function clearOrders() {
   justify-content: center;
   margin: 0 auto 12px;
   color: #cbd5e1;
+}
+
+/* Modern & Clean Receipt Modal Styling with Icon */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.receipt-modal {
+  background: #ffffff;
+  width: 380px;
+  padding: 28px;
+  border-radius: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  font-family: 'Inter', sans-serif;
+  border: 1px solid #f1f5f9;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.receipt-logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+
+.receipt-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1b2559;
+  letter-spacing: -0.5px;
+}
+
+.receipt-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #707eae;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.receipt-meta-box {
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.receipt-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.receipt-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.receipt-info-row span {
+  color: #64748b;
+}
+
+.receipt-info-row strong {
+  color: #1e293b;
+}
+
+.receipt-divider {
+  border-bottom: 1.5px dashed #e2e8f0;
+  margin: 16px 0;
+}
+
+.receipt-items-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.receipt-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.item-name {
+  color: #334155;
+  font-weight: 500;
+}
+
+.item-name small {
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+.item-price {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b2559;
+}
+
+.total-price {
+  font-size: 18px;
+  color: #ff3366;
+}
+
+.receipt-footer-msg {
+  text-align: center;
+  font-size: 12px;
+  color: #707eae;
+  margin-top: 18px;
+  font-weight: 500;
+}
+
+.close-modal-btn {
+  width: 100%;
+  margin-top: 20px;
+  background: #1b2559;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.close-modal-btn:hover {
+  background: #2b3674;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @media (max-width: 1200px) {

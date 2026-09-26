@@ -134,24 +134,17 @@ import {
   Trash2
 } from 'lucide-vue-next'
 
+import { drinks as defaultDrinks } from '../data/Drink'
+import type { Drink } from '../data/Drink'
+
 const router = useRouter()
 
 const adminUsername = computed(() => {
   return localStorage.getItem('adminUsername') || 'Admin'
 })
 
-interface Drink {
-  id: number
-  name: string
-  description: string
-  price: number
-  image: string
-  stock: number
-}
-
 const drinks = ref<Drink[]>([])
 
-// Modal State
 const isModalOpen = ref(false)
 const isEditing = ref(false)
 const currentId = ref<number | null>(null)
@@ -161,54 +154,47 @@ const form = ref({
   description: '',
   price: 0,
   image: '',
-  stock: 10
+  stock: 10,
+  category: 'Milk Tea'
 })
-
-const defaultDrinks: Drink[] = [
-  {
-    id: 1,
-    name: 'Matcha Latte',
-    description: 'Creamy Japanese matcha latte.',
-    price: 3.75,
-    image: '',
-    stock: 20
-  },
-  {
-    id: 2,
-    name: 'Mango Smoothie',
-    description: 'Fresh mango smoothie.',
-    price: 3.50,
-    image: '',
-    stock: 15
-  },
-  {
-    id: 3,
-    name: 'Brown Sugar Milk Tea',
-    description: 'Milk tea with brown sugar.',
-    price: 3.25,
-    image: '',
-    stock: 25
-  }
-]
-
 onMounted(() => {
-  const savedDrinks = localStorage.getItem('adminDrinks')
+  // ឆែកមើលក្នុង localStorage មុនគេបង្អស់
+  const savedDrinks = localStorage.getItem('adminDrinks') || localStorage.getItem('drinks')
+  
   if (savedDrinks) {
     try {
-      drinks.value = JSON.parse(savedDrinks)
+      const parsed = JSON.parse(savedDrinks)
+      // បើមានទិន្នន័យក្នុង localStorage គឺយកវាភ្លាម មិនត្រូវយក defaultDrinks មកជាន់ទេ
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        drinks.value = parsed
+      } else {
+        drinks.value = defaultDrinks
+        persistDrinks()
+      }
     } catch {
       drinks.value = defaultDrinks
+      persistDrinks()
     }
   } else {
+    // បើគ្មានទិន្នន័យសោះ ទើបយក defaultDrinks មកដាក់
     drinks.value = defaultDrinks
+    persistDrinks()
   }
 })
 
 function persistDrinks() {
-  localStorage.setItem('adminDrinks', JSON.stringify(drinks.value))
+  const jsonData = JSON.stringify(drinks.value)
+  // រក្សាទុកក្នុង Key ទាំងពីរដើម្បីធានាថាត្រូវគ្នាជាមួយគ្រប់ Page ទាំងអស់
+  localStorage.setItem('adminDrinks', jsonData)
+  localStorage.setItem('drinks', jsonData)
+  
+  // បញ្ជូនសញ្ញាព្រឹត្តិការណ៍ (Event) ទៅកាន់ Tab ឬ Component ដទៃទៀតឱ្យដឹងថាទិន្នន័យបានប្តូរ
+  window.dispatchEvent(new StorageEvent('storage', {
+    key: 'drinks',
+    newValue: jsonData
+  }))
+  window.dispatchEvent(new Event('storage'))
 }
-
-// Handle Image File Selection
 function handleFileUpload(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
@@ -223,16 +209,14 @@ function handleFileUpload(event: Event) {
   }
 }
 
-// Open Add Modal
 function openAddModal() {
   isEditing.value = false
   currentId.value = null
-  form.value = { name: '', description: '', price: 3.00, image: '', stock: 20 }
+  form.value = { name: '', description: '', price: 3.00, image: '', stock: 20, category: 'Milk Tea' }
   isModalOpen.value = true
 }
 
-// Open Edit Modal
-function openEditModal(drink: Drink) {
+function openEditModal(drink: any) {
   isEditing.value = true
   currentId.value = drink.id
   form.value = {
@@ -240,7 +224,8 @@ function openEditModal(drink: Drink) {
     description: drink.description,
     price: drink.price,
     image: drink.image,
-    stock: drink.stock
+    stock: drink.stock,
+    category: drink.category || 'Milk Tea'
   }
   isModalOpen.value = true
 }
@@ -249,7 +234,6 @@ function closeModal() {
   isModalOpen.value = false
 }
 
-// Save (Add or Update)
 function saveDrink() {
   if (isEditing.value && currentId.value !== null) {
     const index = drinks.value.findIndex(d => d.id === currentId.value)
@@ -271,7 +255,6 @@ function saveDrink() {
   closeModal()
 }
 
-// Delete Drink
 function deleteDrink(id: number) {
   const drink = drinks.value.find(item => item.id === id)
   if (!drink) return
@@ -372,7 +355,7 @@ function deleteDrink(id: number) {
 
 .drink-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr); /* ប្ដូរពី 3 មក 4 ដើម្បីឱ្យវាបានច្រើននិងមិនធំពេក */
   gap: 20px;
 }
 
@@ -390,7 +373,7 @@ function deleteDrink(id: number) {
 }
 
 .drink-image {
-  height: 180px;
+  height: 140px; /* បន្ថយពី 180px មក 140px រួសរាន់និងសមាមាត្រស្អាត */
   background: #fff0f5;
   display: flex;
   align-items: center;
@@ -406,21 +389,25 @@ function deleteDrink(id: number) {
 }
 
 .drink-info {
-  padding: 18px;
+  padding: 15px; /* កាត់បន្ថយ padding បន្តិច */
 }
 
 .drink-info h3 {
-  margin: 0 0 7px;
+  margin: 0 0 5px;
   color: #333;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .drink-info p {
-  margin: 0 0 15px;
+  margin: 0 0 12px;
   color: #888;
-  font-size: 13px;
-  line-height: 1.5;
-  min-height: 39px;
+  font-size: 12px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 34px;
 }
 
 .drink-bottom {
@@ -431,12 +418,12 @@ function deleteDrink(id: number) {
 
 .drink-bottom strong {
   color: #d81b60;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .stock {
-  font-size: 12px;
-  padding: 5px 9px;
+  font-size: 11px;
+  padding: 4px 8px;
   border-radius: 20px;
   background: #e8f5e9;
   color: #2e7d32;
@@ -449,8 +436,8 @@ function deleteDrink(id: number) {
 
 .drink-actions {
   display: flex;
-  gap: 10px;
-  padding: 0 18px 18px;
+  gap: 8px;
+  padding: 0 15px 15px;
 }
 
 .drink-actions button {
@@ -458,12 +445,12 @@ function deleteDrink(id: number) {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  padding: 9px;
+  gap: 5px;
+  padding: 8px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .edit-btn {
@@ -616,6 +603,12 @@ function deleteDrink(id: number) {
 
 .submit-btn:hover {
   background: #ad1457;
+}
+
+@media (max-width: 1400px) {
+  .drink-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1100px) {

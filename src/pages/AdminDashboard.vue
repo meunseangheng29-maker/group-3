@@ -21,7 +21,7 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon drinks">
-            <CupSoda :size="24" />
+            <CupSoda :size="22" />
           </div>
           <div class="stat-info">
             <span>Total Drinks</span>
@@ -31,7 +31,7 @@
 
         <div class="stat-card">
           <div class="stat-icon orders">
-            <ShoppingBag :size="24" />
+            <ShoppingBag :size="22" />
           </div>
           <div class="stat-info">
             <span>Total Orders</span>
@@ -41,7 +41,7 @@
 
         <div class="stat-card">
           <div class="stat-icon customers">
-            <Users :size="24" />
+            <Users :size="22" />
           </div>
           <div class="stat-info">
             <span>Customers</span>
@@ -51,7 +51,7 @@
 
         <div class="stat-card">
           <div class="stat-icon revenue">
-            <DollarSign :size="24" />
+            <DollarSign :size="22" />
           </div>
           <div class="stat-info">
             <span>Total Revenue</span>
@@ -73,7 +73,7 @@
 
           <div class="drink-day-content">
             <div class="drink-image">
-              <Sparkles :size="32" />
+              <Sparkles :size="28" />
             </div>
             <div class="drink-details">
               <h3>Strawberry Matcha Latte</h3>
@@ -199,19 +199,20 @@ const adminUsername = computed(() => {
 
 .admin-content {
   margin-left: 260px;
-  padding: 35px;
+  padding: 30px;
+  max-width: 1400px;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .header-titles h1 {
   margin: 0 0 4px;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #1b2559;
 }
@@ -219,7 +220,7 @@ const adminUsername = computed(() => {
 .header-titles p {
   margin: 0;
   color: #707eae;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .admin-user {
@@ -227,16 +228,17 @@ const adminUsername = computed(() => {
   align-items: center;
   gap: 10px;
   background: white;
-  padding: 8px 16px 8px 10px;
+  padding: 6px 14px 6px 8px;
   border-radius: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   font-weight: 600;
+  font-size: 14px;
   color: #2b3674;
 }
 
 .user-avatar-badge {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
   color: white;
   display: flex;
@@ -249,33 +251,28 @@ const adminUsername = computed(() => {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-bottom: 25px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
   background: white;
-  padding: 22px;
-  border-radius: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .stat-icon {
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .stat-icon.drinks { background: #ffe5ec; color: #ff3366; }
@@ -285,14 +282,14 @@ const adminUsername = computed(() => {
 
 .stat-info span {
   color: #707eae;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .stat-info h2 {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   color: #1b2559;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -300,14 +297,14 @@ const adminUsername = computed(() => {
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 25px;
-  margin-bottom: 25px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .dashboard-card {
   background: white;
-  padding: 24px;
-  border-radius: 16px;
+  padding: 20px 24px;
+  border-radius: 14px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
@@ -315,12 +312,12 @@ const adminUsername = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .card-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #1b2559;
 }
@@ -333,7 +330,6 @@ const adminUsername = computed(() => {
   display: flex;
   align-items: center;
   gap: 4px;
-  transition: opacity 0.2s;
 }
 
 .action-link:hover {
@@ -348,43 +344,44 @@ const adminUsername = computed(() => {
 .drink-day-content {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   background: linear-gradient(135deg, #fff0f3 0%, #fff 100%);
-  padding: 18px;
+  padding: 14px 16px;
   border-radius: 12px;
   border: 1px solid #ffe3ec;
 }
 
 .drink-image {
-  width: 70px;
-  height: 70px;
+  width: 56px;
+  height: 56px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: white;
   color: #ff3366;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(255, 51, 102, 0.08);
+  flex-shrink: 0;
 }
 
 .drink-details h3 {
-  margin: 0 0 4px;
-  font-size: 16px;
+  margin: 0 0 2px;
+  font-size: 15px;
   color: #1b2559;
 }
 
 .drink-details p {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: #707eae;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .price-tag {
   background: #ff3366;
   color: white;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -392,12 +389,12 @@ const adminUsername = computed(() => {
 .order-status-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .status-box {
-  padding: 16px;
-  border-radius: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -406,13 +403,13 @@ const adminUsername = computed(() => {
 
 .status-box span {
   color: #707eae;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .status-box strong {
   color: #1b2559;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .status-box.pending { background: #fffbeb; border-color: #fef3c7; }
@@ -431,13 +428,13 @@ table {
 }
 
 th, td {
-  padding: 14px 16px;
+  padding: 12px 14px;
   text-align: left;
 }
 
 th {
   color: #707eae;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   border-bottom: 1px solid #f1f5f9;
@@ -445,7 +442,7 @@ th {
 
 td {
   color: #2b3674;
-  font-size: 14px;
+  font-size: 13px;
   border-bottom: 1px solid #f8fafc;
 }
 
@@ -458,34 +455,25 @@ td {
   font-weight: 600;
 }
 
-/* Status Badges */
 .status-badge {
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
   display: inline-block;
 }
 
-.status-badge.completed {
-  background: #dcfce7;
-  color: #15803d;
-}
+.status-badge.completed { background: #dcfce7; color: #15803d; }
+.status-badge.preparing { background: #ffedd5; color: #c2410c; }
+.status-badge.pending { background: #fef3c7; color: #b45309; }
 
-.status-badge.preparing {
-  background: #ffedd5;
-  color: #c2410c;
-}
-
-.status-badge.pending {
-  background: #fef3c7;
-  color: #b45309;
-}
-
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
   .stats-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
+}
+
+@media (max-width: 900px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
@@ -494,12 +482,12 @@ td {
 @media (max-width: 768px) {
   .admin-content {
     margin-left: 70px;
-    padding: 20px;
+    padding: 15px;
   }
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 15px;
+    gap: 12px;
   }
 }
 </style>

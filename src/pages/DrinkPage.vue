@@ -1,9 +1,9 @@
-
 <script setup lang="ts">
-
 import {
   computed,
-  ref
+  ref,
+  onMounted,
+  onUnmounted
 } from 'vue'
 
 import {
@@ -14,16 +14,11 @@ import {
 
 import DrinkCard from '../components/DrinkCard.vue'
 
-import {
-  drinks
-} from '../data/Drink'
-
-import type {
-  Drink
-} from '../data/Drink'
+// នាំចូលទិន្នន័យដើមទុកជា Backup ក្រែងលោក្នុង localStorage គ្មានទិន្នន័យ
+import { drinks as defaultDrinks } from '../data/Drink'
+import type { Drink } from '../data/Drink'
 
 import { useCart } from '../stores/cart'
-
 
 // =====================================================
 // CART
@@ -31,13 +26,46 @@ import { useCart } from '../stores/cart'
 
 const { addToCart: addDrinkToCart } = useCart()
 
+// =====================================================
+// DRINKS DATA (Linked with LocalStorage / Admin)
+// =====================================================
+
+const drinks = ref<Drink[]>([])
+
+// មុខងារសម្រាប់ទាញយកទិន្នន័យពី localStorage
+const loadDrinks = () => {
+  const savedDrinks = localStorage.getItem('drinks') || localStorage.getItem('adminDrinks')
+  if (savedDrinks) {
+    try {
+      const parsed = JSON.parse(savedDrinks)
+      if (parsed && parsed.length > 0) {
+        drinks.value = parsed
+      } else {
+        drinks.value = defaultDrinks
+      }
+    } catch {
+      drinks.value = defaultDrinks
+    }
+  } else {
+    drinks.value = defaultDrinks
+  }
+}
+
+onMounted(() => {
+  loadDrinks()
+  // ស្ដាប់ព្រឹត្តិការណ៍ (Event) ពេល Admin កែប្រែទិន្នន័យ ដើម្បី update មក Customer ភ្លាមៗ
+  window.addEventListener('storage', loadDrinks)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', loadDrinks)
+})
 
 // =====================================================
 // SEARCH
 // =====================================================
 
 const search = ref('')
-
 
 // =====================================================
 // CATEGORY
@@ -56,20 +84,16 @@ const categories = [
   'Specials'
 ]
 
-
 // =====================================================
 // FILTER DRINKS
 // =====================================================
 
 const filteredDrinks = computed(() => {
-
-  return drinks.filter((drink) => {
-
+  return drinks.value.filter((drink) => {
     // Category filter
     const matchCategory =
       selectedCategory.value === 'All Drinks' ||
       drink.category === selectedCategory.value
-
 
     // Search filter
     const matchSearch =
@@ -79,13 +103,9 @@ const filteredDrinks = computed(() => {
           search.value.toLowerCase()
         )
 
-
     return matchCategory && matchSearch
-
   })
-
 })
-
 
 // =====================================================
 // TOAST
@@ -93,13 +113,11 @@ const filteredDrinks = computed(() => {
 
 const toastMessage = ref('')
 
-
 // =====================================================
 // ADD TO CART
 // =====================================================
 
 function addToCart(drink: Drink) {
-
   // Add drink to cart
   addDrinkToCart(drink)
 
@@ -107,16 +125,11 @@ function addToCart(drink: Drink) {
   toastMessage.value =
     `${drink.name} added to cart`
 
-
   // Hide message after 2.5 seconds
   setTimeout(() => {
-
     toastMessage.value = ''
-
   }, 2500)
-
 }
-
 </script>
 
 
